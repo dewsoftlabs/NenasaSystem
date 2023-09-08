@@ -34,6 +34,12 @@ jobs:
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set region us-east-1  # Update with your desired AWS region
-
-      - name: Sync to S3
-        run : aws s3 cp --recursive ./build s3://${{ secrets.STAGING_BUCKET_NAME }}/ --acl public-read
+          
+      - name: Deploy to Staging Server
+        uses: actions/aws/cli@v2
+        with:
+          args: s3 sync ./build/ s3://${{ secrets.STAGING_BUCKET_NAME }}/ --acl public-read --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-west-1  # Adjust to your S3 bucket's region
