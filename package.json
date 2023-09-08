@@ -35,21 +35,33 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "CI=false react-scripts build",
+    "build:local": "react-scripts build",
     "test": "react-scripts test",
     "sync:staging": "aws s3 sync --profile aws-nenasa ./build s3://nenasa-stagin/",
     "sync:production": "aws s3 sync --profile aws-nenasa ./build s3://nenasa-production/",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": ["react-app"]
+    "extends": [
+      "react-app"
+    ]
   },
   "babel": {
-    "presets": ["@babel/preset-react"]
+    "presets": [
+      "@babel/preset-react"
+    ]
   },
   "browserslist": {
-    "production": ["defaults", "not IE 11"],
-    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+    "production": [
+      "defaults",
+      "not IE 11"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
