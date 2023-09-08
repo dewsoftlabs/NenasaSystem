@@ -37,6 +37,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "sync:staging": "aws s3 sync --profile aws-nenasa ./build s3://nenasa-stagin/",
+    "sync:production": "aws s3 sync --profile aws-nenasa ./build s3://nenasa-production/",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
