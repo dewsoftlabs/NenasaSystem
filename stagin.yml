@@ -1,26 +1,35 @@
-name: Deploy Website to S3
+name: Deploy Staging Website
 
 on:
   push:
     branches:
-      - stagin
+      - staging
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Deploy to S3
-        uses: jeanlescure/react-deploy-to-s3-action@main
+      - name: Install Dependencies
+        run: npm install  # or 'yarn install' if you use yarn
+
+      - name: Build Staging
+        run: npm run build  # or 'yarn build' if you use yarn
+
+      - name: Deploy to Staging
+        uses: actions/upload-artifact@v2
         with:
-          args: --acl public-read --follow-symlinks --delete
+          name: staging
+          path: build
+
+      - name: Deploy to Staging Server
+        uses: actions/aws/cli@v2
+        with:
+          args: s3 sync ./build/ s3://your-staging-bucket/ --acl public-read --delete
         env:
-          NODE_ENV: production
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-west-1 # Adjust to your S3 bucket's region
-          SOURCE_DIR: build # Update with your build directory
+          AWS_DEFAULT_REGION: us-west-1  # Adjust to your S3 bucket's region
