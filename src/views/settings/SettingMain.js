@@ -59,7 +59,7 @@ const SettingsMainPage = () => {
             </Grid>
             <Grid item xs={12}>
               <Button variant="contained" className={classes.saveButton}>
-                Change Password
+                Change Password Name
               </Button>
             </Grid>
           </Grid>
