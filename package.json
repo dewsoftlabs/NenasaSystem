@@ -1,5 +1,5 @@
 {
-  "name": "berry-free-material-react-cra",
+  "name": "nenasa-investment",
   "version": "3.3.2",
   "private": true,
   "homepage": "https://berrydashboard.io/",
@@ -42,25 +42,14 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
+    "extends": ["react-app"]
   },
   "babel": {
-    "presets": [
-      "@babel/preset-react"
-    ]
+    "presets": ["@babel/preset-react"]
   },
   "browserslist": {
-    "production": [
-      "defaults",
-      "not IE 11"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "production": ["defaults", "not IE 11"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
