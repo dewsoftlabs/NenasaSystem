@@ -11,12 +11,23 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Install Node.js and npm
         uses: actions/setup-node@v2
         with:
           node-version: '14'
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Configure AWS Credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set region us-east-1  # Update with your desired AWS region
 
       - name: Install Dependencies
         run: npm install  # or 'yarn install' if you use yarn
@@ -25,9 +36,4 @@ jobs:
         run: npm run build  # or 'yarn build' if you use yarn
 
       - name: Deploy to Staging S3
-        uses: actions/aws/cli@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Update with your desired AWS region
-          command: s3 sync ./build/ s3://$STAGING_BUCKET_NAME/ --acl public-read --delete
+        run: aws s3 sync ./build/ s3://$STAGING_BUCKET_NAME/ --acl public-read --delete
