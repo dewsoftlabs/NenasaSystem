@@ -8,7 +8,7 @@ import Loadable from 'ui-component/Loadable';
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
 // utilities routing
-const Settings = Loadable(lazy(() => import('views/settings/SettingMain')));
+
 const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -27,15 +27,6 @@ const MainRoutes = {
         {
           path: '/dashboard',
           element: <DashboardDefault />
-        }
-      ]
-    },
-    {
-      path: 'settings',
-      children: [
-        {
-          path: '/settings',
-          element: <Settings />
         }
       ]
     },
