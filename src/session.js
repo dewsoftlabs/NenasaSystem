@@ -5,7 +5,7 @@ const setToken = (token) => {
 
 const setUserid = (userid) => {
   localStorage.setItem('userid', userid);
-}
+};
 
 const setPermissionCodes = (permissions) => {
   // Store the permission codes array in session storage
@@ -22,14 +22,13 @@ const getPermissionCodes = () => {
   } else {
     return []; // Return an empty array if no stored data found
   }
-}
+};
 
 // Function to check if a permission code exists in stored permission codes
 const hasPermission = (permissionCode) => {
   const storedPermissionCodes = getPermissionCodes();
   return storedPermissionCodes.includes(permissionCode);
-}
-
+};
 
 const getToken = () => {
   return localStorage.getItem('token');
@@ -37,29 +36,28 @@ const getToken = () => {
 
 const getUserid = () => {
   return localStorage.getItem('userid');
-}
-
+};
 
 const isUserAuth = () => {
   const userid = getUserid();
   return !!userid;
-}
+};
 
 const setUserBranchID = (branchid) => {
   localStorage.setItem('branchid', branchid);
-}
+};
 
 const setUserRoleID = (userroleid) => {
   localStorage.setItem('userroleid', userroleid);
-}
+};
 
 const getUserBranchID = () => {
-  return localStorage.getItem('branchid')
-}
+  return localStorage.getItem('branchid');
+};
 
 const getUserRoleID = () => {
-  return localStorage.getItem('userroleid')
-}
+  return localStorage.getItem('userroleid');
+};
 
 const isAuthenticated = () => {
   const token = getToken();
@@ -70,7 +68,7 @@ const isLogged = () => {
   const token = getToken();
   const userid = getUserid();
   return !!token && !!userid;
-}
+};
 
 const logout = () => {
   localStorage.removeItem('token');

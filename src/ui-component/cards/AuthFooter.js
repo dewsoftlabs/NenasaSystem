@@ -6,7 +6,6 @@ import { Typography, Stack } from '@mui/material';
 const AuthFooter = () => {
   // Get the current year
   const currentYear = new Date().getFullYear();
-  
   return (
     <Stack direction="row" justifyContent="space-between">
       <Typography variant="subtitle2">Nenasa Investment &copy; {currentYear}. All Rights Reserved</Typography>
