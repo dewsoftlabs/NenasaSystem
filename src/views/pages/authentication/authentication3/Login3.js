@@ -28,8 +28,8 @@ const Login = () => {
               <AuthCardWrapper>
                 <Grid container spacing={2} alignItems="center" justifyContent="center">
                   <Grid item sx={{ mb: 3 }}>
-                    <Link style={{display : 'flex', justifyContent : 'center'}} to="#">
-                      <img style={{width : '30%'}} src={Logo} alt='Logo' />
+                    <Link style={{ display: 'flex', justifyContent: 'center' }} to="#">
+                      <img style={{ width: '30%' }} src={Logo} alt="Logo" />
                     </Link>
                   </Grid>
                   <Grid item xs={12}>

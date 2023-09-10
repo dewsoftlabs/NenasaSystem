@@ -13,7 +13,7 @@ import {
   InputLabel,
   OutlinedInput,
   Stack,
-  Typography,
+  Typography
   // useMediaQuery
 } from '@mui/material';
 
@@ -36,7 +36,6 @@ import { setToken, setUserid, setUserRoleID, getToken, setUserBranchID } from '.
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const Login = ({ ...others }) => {
-
   const theme = useTheme();
   const scriptedRef = useScriptRef();
 
@@ -46,7 +45,7 @@ const Login = ({ ...others }) => {
     try {
       const response = await axios.post(process.env.REACT_APP_API_ENDPOINT + '/user/login', {
         username,
-        password,
+        password
       });
 
       // Handle the response here, e.g., store the user token in localStorage or state
@@ -60,8 +59,6 @@ const Login = ({ ...others }) => {
       return { success: false, error: error.error };
     }
   };
-
-
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
@@ -114,7 +111,6 @@ const Login = ({ ...others }) => {
             }
           }
         }}
-
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit} {...others}>
