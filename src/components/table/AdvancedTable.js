@@ -185,7 +185,14 @@ function SimpleTable(props) {
       <MaterialReactTable
         columns={props.columns}
         data={props.dataSet}
-        initialState={{ density: 'compact' }}
+        enableGrouping={tableSettings.group.enableGroup}
+        enableStickyHeader
+        enableStickyFooter
+        initialState={{
+          density: 'compact',
+          expanded: tableSettings.group.expanded, //expand all groups by default
+          grouping: tableSettings.group.groupColumn
+        }}
         getRowId={(row) => row[tableSettings.idName]}
         enableEditing={tableSettings.editing.enableEditing}
         editingMode={tableSettings.editing.editionMode}
@@ -213,8 +220,8 @@ function SimpleTable(props) {
                 </Button>
               </div>
             )}
-            {tableSettings.delete.deleteType == 'multiple' ||
-              (tableSettings.delete.deleteType === 'mix' && (
+            {tableSettings.delete.deleteType === 'multiple' ||
+              (tableSettings.delete.deleteApi !== '' && tableSettings.delete.deleteType === 'mix' && (
                 <div>
                   <Button
                     style={{ color: '#000', backgroundColor: '#fff' }}
@@ -224,7 +231,7 @@ function SimpleTable(props) {
                     startIcon={<DeleteOutlineOutlinedIcon />}
                     variant="contained"
                   >
-                    {tableSettings.delete.deleteText ? tableSettings.delete.deleteText : 'Delete'}
+                    Delete
                   </Button>
                 </div>
               ))}
@@ -261,7 +268,8 @@ function SimpleTable(props) {
           tableSettings.delete.deleteType === 'mix'
             ? ({ row, closeMenu }) => {
                 const deleteMenuItem =
-                  tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix' ? (
+                  (tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix') &&
+                  tableSettings.delete.singleDeleteApi !== '' ? (
                     <MenuItem
                       key={1}
                       onClick={() => {
@@ -270,7 +278,7 @@ function SimpleTable(props) {
                       }}
                       style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     >
-                      <IconTrash /> Delete
+                      <IconTrash /> {tableSettings.delete.deleteText ? tableSettings.delete.deleteText : 'Delete'}
                     </MenuItem>
                   ) : null;
 
@@ -287,7 +295,7 @@ function SimpleTable(props) {
                   </MenuItem>
                 ));
 
-                return [deleteMenuItem, ...actionMenuItems];
+                return [...actionMenuItems, deleteMenuItem];
               }
             : null // If action menu is not enabled, set to null
         }
