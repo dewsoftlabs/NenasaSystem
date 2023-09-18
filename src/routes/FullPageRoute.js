@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { lazy } from 'react';
 
 // project imports
@@ -20,6 +21,14 @@ const MainRoutes = {
       element: <UserSettings />
     },
     {
+      path: '/userrole-settings',
+      element: <UserroleSettings />
+    },
+    {
+      path: '/permission-settings',
+      element: <PermissionSettings />
+    },
+    {
       path: 'user-settings',
       children: [
         {
@@ -27,26 +36,7 @@ const MainRoutes = {
           element: <UserSettings />
         }
       ]
-    },
-    {
-      path: 'permission-settings',
-      children: [
-        {
-          path: 'permission-settings',
-          element: <PermissionSettings />
-        }
-      ]
-    },
-    {
-      path: 'userrole-settings',
-      children: [
-        {
-          path: 'userrole-settings',
-          element: <UserroleSettings />
-        }
-      ]
     }
-
   ]
 };
 
