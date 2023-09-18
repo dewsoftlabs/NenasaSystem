@@ -1,18 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useMemo } from 'react';
-import { Button, Grid, Typography } from '@mui/material';
-import MainCard from 'ui-component/cards/MainCard';
-import SimpleTable from '../../components/table/SimpleTable'; // Update this with the actual path to your SimpleTable component
+import { Grid } from '@mui/material';
 import Axios from 'axios'; // Make sure to import Axios
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import MainCard from 'ui-component/cards/MainCard';
+import Table from '../../components/table/Table'; // Update this with the actual path to your SimpleTable component
 import { getToken, logout } from '../../session'; // Import these functions if needed
-import { Box } from '@mui/system';
-const defaultProPic = 'path-to-default-image.png';
-
-import { IconSquareRoundedPlusFilled } from '@tabler/icons-react';
-import { IconFileSpreadsheet } from '@tabler/icons-react';
-import { IconTrash } from '@tabler/icons-react';
-import { IconPlus } from '@tabler/icons-react';
+import defaultProPic from '../../assets/images/default/default-profile-image.png';
 
 const UserSettingsMainPage = () => {
   const [userList, setUserList] = useState([]);
@@ -20,183 +15,7 @@ const UserSettingsMainPage = () => {
   const [userRole, setUserRole] = useState([]);
   const [branch, setBranch] = useState([]);
 
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: 'fullname',
-        header: 'Full Name',
-        export: true,
-        enableColumnActions: true,
-        minSize: 90,
-        maxSize: 360,
-        size: 150,
-        formFeild: {
-          isFormFeild: true,
-          type: 'TextField',
-          xs: 12,
-          validationType: 'requiredField'
-        }
-      },
-      {
-        accessorKey: 'address',
-        header: 'Address',
-        export: true,
-        enableEditing: true,
-        enableColumnActions: true,
-        minSize: 90,
-        maxSize: 360,
-        size: 160,
-        formFeild: {
-          isFormFeild: true,
-          type: 'TextField',
-          xs: 12,
-          validationType: 'requiredField'
-        }
-      },
-      {
-        accessorKey: 'email',
-        header: 'Email',
-        export: true,
-        enableEditing: true,
-        enableColumnActions: true,
-        minSize: 90,
-        maxSize: 360,
-        size: 150,
-        formFeild: {
-          isFormFeild: true,
-          type: 'TextField',
-          xs: 12,
-          validationType: 'email'
-        }
-      },
-      {
-        accessorKey: 'phonenumber',
-        header: 'Mobile',
-        export: true,
-        enableEditing: true,
-        enableColumnActions: true,
-        minSize: 50,
-        maxSize: 50,
-        size: 50,
-        formFeild: {
-          isFormFeild: true,
-          type: 'TextField',
-          xs: 6,
-          validationType: 'mobile'
-        }
-      },
-      {
-        accessorKey: 'username',
-        header: 'User Name',
-        export: true,
-        enableEditing: true,
-        enableColumnActions: true,
-        minSize: 50,
-        maxSize: 50,
-        size: 50,
-        formFeild: {
-          isFormFeild: true,
-          type: 'TextField',
-          xs: 6,
-          validationType: 'requiredField'
-        }
-      },
-      {
-        accessorKey: 'userroleid',
-        header: 'User Role',
-        export: true,
-        enableEditing: true,
-        enableColumnActions: true,
-        minSize: 90,
-        maxSize: 360,
-        size: 180,
-        Cell: ({ renderedCellValue }) => {
-          const userRoleName = userRole.find((usrRole) => usrRole.userroleid === renderedCellValue)?.role;
-          return <>{userRoleName ? userRoleName : 'Unknown'}</>;
-        },
-        editVariant: 'select',
-        formFeild: {
-          isFormFeild: true,
-          type: 'select',
-          xs: 6,
-          validationType: 'requiredField'
-        },
-        editSelectOptions: userRole.map((usrRole) => ({ value: usrRole.userroleid, text: usrRole.role }))
-      },
-      {
-        accessorKey: 'branchid',
-        header: 'Branch',
-        export: true,
-        enableEditing: true,
-        enableColumnActions: true,
-        minSize: 90,
-        maxSize: 360,
-        size: 180,
-        Cell: ({ renderedCellValue }) => {
-          const BranchName = branch.find((branch) => branch.branchid === renderedCellValue)?.branch_name;
-          return <>{BranchName ? BranchName : 'Unknown'}</>;
-        },
-        editVariant: 'select',
-        formFeild: {
-          isFormFeild: true,
-          type: 'select',
-          xs: 6,
-          validationType: 'requiredField'
-        },
-        editSelectOptions: branch.map((branch) => ({ value: branch.branchid, text: branch.branch_name }))
-      },
-      {
-        accessorKey: 'profileimage',
-        header: 'Profile Image',
-        enableEditing: false,
-        enableColumnActions: false,
-        minSize: 50,
-        maxSize: 50,
-        size: 50,
-        Cell: ({ renderedCellValue }) => (
-          <img
-            src={renderedCellValue ? `${process.env.REACT_APP_API_ENDPOINT}/user/getprofile/${renderedCellValue}` : defaultProPic}
-            alt="Profile"
-            style={{ width: '50px', height: '50px', borderRadius: '50%' }}
-          />
-        ),
-        formFeild: {
-          isFormFeild: false
-        }
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
-        Cell: ({ renderedCellValue }) => <>{renderedCellValue === 1 ? 'Active' : 'Deactive'}</>,
-        editVariant: 'select',
-        minSize: 90,
-        maxSize: 360,
-        size: 100,
-        editSelectOptions: [
-          {
-            value: '1',
-            text: 'Active'
-          },
-          {
-            value: '0',
-            text: 'Deactive'
-          }
-        ],
-        formFeild: {
-          isFormFeild: false
-        }
-      }
-    ],
-    [userRole, branch]
-  );
-
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [usersResponse, userRoleResponse, branchResponse] = await Promise.all([
         Axios.get(process.env.REACT_APP_API_ENDPOINT + '/user/all', { headers: { 'x-token': getToken() } }),
@@ -219,6 +38,359 @@ const UserSettingsMainPage = () => {
       handleErrorResponse(error);
     } finally {
       setisLoading(false);
+    }
+  }, []);
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'fullname',
+        header: 'Full Name',
+        export: true,
+        enableColumnActions: true,
+        minSize: 90,
+        maxSize: 360,
+        size: 150
+      },
+      {
+        accessorKey: 'address',
+        header: 'Address',
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 90,
+        maxSize: 360,
+        size: 160
+      },
+      {
+        accessorKey: 'email',
+        header: 'Email',
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 90,
+        maxSize: 360,
+        size: 150
+      },
+      {
+        accessorKey: 'phonenumber',
+        header: 'Mobile',
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 50,
+        maxSize: 50,
+        size: 50
+      },
+      {
+        accessorKey: 'gender',
+        header: 'Gender',
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 50,
+        maxSize: 50,
+        size: 50
+      },
+      {
+        accessorKey: 'username',
+        header: 'User Name',
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 50,
+        maxSize: 50,
+        size: 50
+      },
+      {
+        accessorKey: 'userroleid',
+        header: 'User Role',
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 90,
+        maxSize: 360,
+        size: 180,
+        Cell: ({ renderedCellValue }) => {
+          const userRoleName = userRole.find((usrRole) => usrRole.userroleid === renderedCellValue)?.role;
+          return <>{userRoleName ? userRoleName : 'Unknown'}</>;
+        },
+        editVariant: 'select',
+
+        editSelectOptions: userRole.map((usrRole) => ({ value: usrRole.userroleid, text: usrRole.role }))
+      },
+      {
+        accessorKey: 'branchid',
+        header: 'Branch',
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 90,
+        maxSize: 360,
+        size: 180,
+        Cell: ({ renderedCellValue }) => {
+          const BranchName = branch.find((branch) => branch.branchid === renderedCellValue)?.branch_name;
+          return <>{BranchName ? BranchName : 'Unknown'}</>;
+        },
+        editVariant: 'select',
+
+        editSelectOptions: branch.map((branch) => ({ value: branch.branchid, text: branch.branch_name }))
+      },
+      {
+        accessorKey: 'profileimage',
+        header: 'Profile Image',
+        enableEditing: false,
+        enableColumnActions: false,
+        minSize: 50,
+        maxSize: 50,
+        size: 50,
+        Cell: ({ renderedCellValue }) => (
+          <img
+            src={renderedCellValue ? `${process.env.REACT_APP_API_ENDPOINT}/user/getprofile/${renderedCellValue}` : defaultProPic}
+            alt="Profile"
+            style={{ width: '50px', height: '50px', borderRadius: '50%' }}
+          />
+        )
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        Cell: ({ renderedCellValue }) => <>{renderedCellValue === 1 ? 'Active' : 'Deactive'}</>,
+        editVariant: 'select',
+        minSize: 90,
+        maxSize: 360,
+        size: 100,
+        editSelectOptions: [
+          {
+            value: '1',
+            text: 'Active'
+          },
+          {
+            value: '0',
+            text: 'Deactive'
+          }
+        ]
+      }
+    ],
+    [userRole, branch]
+  );
+
+  const createForm = useMemo(
+    () => [
+      {
+        formName: 'useradd',
+        formHeading: 'User Create Form',
+        headingVariant: 'h3',
+        fields: [
+          {
+            accessorKey: 'fullname',
+            header: 'Full Name',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'TextField', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              value: '',
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
+            accessorKey: 'address',
+            header: 'Address',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'text', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
+            accessorKey: 'email',
+            header: 'Email',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'email', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              isRequired: true,
+              validationType: 'email' // default | custom
+            }
+          },
+          {
+            accessorKey: 'phonenumber',
+            header: 'Mobile',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'text', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'mobile' // default | custom
+            }
+          },
+          {
+            accessorKey: 'gender',
+            header: 'Gender',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'select', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            },
+            editSelectOptions: [
+              {
+                value: 'Male',
+                text: 'Male'
+              },
+              {
+                value: 'Female',
+                text: 'Female'
+              }
+            ]
+          },
+          // Add more fields here
+          {
+            accessorKey: 'nic',
+            header: 'NIC',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled
+              type: 'text', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'nic' // default | custom
+            }
+          },
+          {
+            accessorKey: 'username',
+            header: 'User Name',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled
+              type: 'text', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
+            accessorKey: 'password',
+            header: 'Password',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'password', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'password' // default | custom
+            }
+          },
+          {
+            accessorKey: 'confirm_password',
+            header: 'Confirm Password',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'password', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
+            accessorKey: 'userroleid',
+            header: 'User Role',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'select', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            },
+            editSelectOptions: userRole.map((usrRole) => ({
+              value: usrRole.userroleid,
+              text: usrRole.role
+            }))
+          },
+          {
+            accessorKey: 'branchid',
+            header: 'Branch',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'select', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            },
+            editSelectOptions: branch.map((branch) => ({
+              value: branch.branchid,
+              text: branch.branch_name
+            }))
+          }
+        ]
+      }
+    ],
+    [userRole, branch]
+  );
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [fetchData]);
+
+  const table = {
+    table: 'User',
+    tableType: 'simple',
+    heading: 'User Table',
+    enableHeading: false,
+    enableCopy: true,
+    enableRowNumbers: false,
+    rowAction: false,
+    idName: 'userid',
+    enableCSVExport: true,
+    enablepdf: true,
+    editing: {
+      enableEditing: true,
+      editionMode: 'row',
+      actionMenu: {
+        enableActionMenu: true,
+        positionActionsColumn: 'first', // first | last
+        actionMenudata: [
+          // {
+          //   key: 2,
+          //   action: (row) => {
+          //     console.info('Change Image', row);
+          //   },
+          //   icon: <IconUserCircle />,
+          //   menuName: 'Change Image'
+          // }
+          // Add more menu items as needed
+        ]
+      },
+      updateApi: '/user/update/'
+    },
+
+    delete: {
+      deleteType: 'mix', //single | multiple | mix
+      deleteApi: '/user/delete/',
+      singleDeleteApi: '/user/delete/'
+    },
+    pagination: {
+      enablePagination: true,
+      positionPagination: 'bottom'
+    },
+    add: {
+      enableAddButton: true,
+      addButtonText: 'Add User',
+      addApi: '/user/create'
     }
   };
 
@@ -247,46 +419,25 @@ const UserSettingsMainPage = () => {
 
   return (
     <MainCard>
-      <Box
-        sx={{
-          display: 'flex',
-          gap: '1rem',
-          p: '0.5rem',
-          flexWrap: 'wrap',
-          justifyContent: 'flex-start'
-        }}
-      >
-        <Typography variant="h1">
-          <a href="#add-new" onClick={handleAddNew}>
-            <IconPlus > Add New</IconPlus>
-          </a>
-        </Typography>
-        <Typography variant="h1">
-          <a href="#export-excel" onClick={handleExportExcel}>
-            <IconFileSpreadsheet />
-          </a>
-        </Typography>
-        <Typography variant="h1">
-          <a href="#delete" onClick={handleDelete}>
-            <IconTrash />
-          </a>
-        </Typography>
-      </Box>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={1500}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 9999 }} // Add a higher z-index value to ensure it appears on top
+      />
       <Grid item xs={12}>
-        <SimpleTable
-          tableHeading="Users"
+        <Table
+          createForm={createForm}
+          fetchData={fetchData}
           columns={columns}
           dataSet={userList}
           isLoading={isLoading}
-          idName="userid"
-          // handleSaveRow={/* handleSaveRow function */}
-          // deletedata={/* deletedata function */}
-          enableClickToCopy
-          enableRowNumbers={false}
-          enableRowVirtualization
-          addButtonHeading="Add User"
-          enableAddButton={true}
-          // handleSubmit={/* handleSubmit function */}
+          tableSettings={table}
         />
       </Grid>
     </MainCard>
