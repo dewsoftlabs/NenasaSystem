@@ -27,15 +27,11 @@ const NavCollapse = ({ menu, level }) => {
   const handleClick = () => {
     // Toggle the 'open' state
     setOpen(!open);
-  
+
     // Check if the menu.id is 'loan', 'deposit', or 'reports'
     // If it is one of them, set 'selected' to null; otherwise, set it to menu.id
-    setSelected(
-      menu.id === 'loan' || menu.id === 'deposit' || menu.id === 'reports' || menu.id === 'officer' || menu.id === 'customer' || menu.id === 'employee'
-        ? null
-        : menu.id
-    );
-  
+    setSelected((menu.id === menu.id) === 'customer' ? null : menu.id);
+
     // Check if menu.id is not 'loan', 'deposit', or 'reports' before navigating
     if (
       menu.id !== 'loan' &&
@@ -50,7 +46,6 @@ const NavCollapse = ({ menu, level }) => {
       navigate(menu.children[0].url);
     }
   };
-  
 
   const { pathname } = useLocation();
   const checkOpenForParent = (child, id) => {
