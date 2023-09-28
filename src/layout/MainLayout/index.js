@@ -12,7 +12,7 @@ import Sidebar from './Sidebar';
 import Customization from '../Customization';
 import navigation from 'menu-items';
 import { drawerWidth } from 'store/constant';
-import { SET_MENU } from 'store/actions';
+import { SET_MENU } from 'store/customization/actions';
 import { useNavigate } from 'react-router-dom';
 
 import { isAuthenticated } from "../../session";

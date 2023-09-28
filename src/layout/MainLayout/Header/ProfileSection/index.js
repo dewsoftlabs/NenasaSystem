@@ -1,13 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+/* eslint-disable jsx-a11y/img-redundant-alt */
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { logout } from '../../../../session';
-
+import { setShopDetails } from '../../../../store/shop/shopActions';
+import { setUserDetails } from '../../../../store/user/userAction';
+import { useSelector, useDispatch } from 'react-redux';
+import { getToken, getUserid } from '../../../../session';
+import defaultProPic from '../../../../assets/images/default/default-profile-image.png';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
-  Avatar,
   Box,
   Card,
   CardContent,
@@ -15,12 +18,10 @@ import {
   ClickAwayListener,
   Divider,
   Grid,
-  InputAdornment,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  OutlinedInput,
   Paper,
   Popper,
   Stack,
@@ -35,10 +36,10 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 // import UpgradePlanCard from './UpgradePlanCard';
-import User1 from 'assets/images/users/user-round.svg';
 
 // assets
-import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
+import { IconLogout, IconSettings, IconUser } from '@tabler/icons';
+import Axios from 'axios';
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -46,15 +47,25 @@ const ProfileSection = () => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [sdm, setSdm] = useState(true);
-  const [value, setValue] = useState('');
+  // const [value, setValue] = useState('');
   const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
+
   /**
    * anchorRef is used on different componets and specifying one type leads to other components throwing an error
    * */
+  //user
+
+  const fullname = useSelector((state) => state.user.fullname);
+  const username = useSelector((state) => state.user.username);
+  const image = useSelector((state) => state.user.profileimage);
+
+  const imagesrc = image ? `${process.env.REACT_APP_API_ENDPOINT}/user/me/getprofile/${image}` : defaultProPic;
+
   const anchorRef = useRef(null);
   const handleLogout = async () => {
     console.log(logout());
@@ -80,14 +91,49 @@ const ProfileSection = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
+  const fetchData = useCallback(async () => {
+    try {
+      const [responseData, userData] = await Promise.all([
+        Axios.get(process.env.REACT_APP_API_ENDPOINT + '/shop/all', { headers: { 'x-token': getToken() } }),
+        Axios.get(process.env.REACT_APP_API_ENDPOINT + '/user/me/' + getUserid(), { headers: { 'x-token': getToken() } })
+      ]);
+
+      if (responseData.status === 200) {
+        dispatch(setShopDetails(responseData.data[0]));
+      }
+
+      if (userData.status === 200) {
+        console.log(userData.data[0]);
+        dispatch(setUserDetails(userData.data[0]));
+      }
+    } catch (error) {
+      console.error('Axios Error:', error);
+      handleErrorResponse(error);
+    }
+  }, [dispatch]); // Add dispatch as a dependency
+
+  const handleErrorResponse = (error) => {
+    if (error.response) {
+      if (error.response.status === 401) {
+        logout();
+      }
+    }
+  };
+
   const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
     }
-
+    fetchData();
     prevOpen.current = open;
-  }, [open]);
+  }, [open, fetchData]); // Add fetchData as a dependency
+
+  // useEffect(() => {
+  //   fetchData();
+  //   const interval = setInterval(fetchData, 5 * 60 * 1000);
+  //   return () => clearInterval(interval);
+  // }, [fetchData]);
 
   return (
     <>
@@ -112,17 +158,16 @@ const ProfileSection = () => {
           }
         }}
         icon={
-          <Avatar
-            src={User1}
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: '8px 0 8px 8px !important',
-              cursor: 'pointer'
+          <img
+            src={imagesrc} // Replace with the URL or source of your image
+            alt="User Image" // Add an appropriate alt text for accessibility
+            style={{
+              width: '32px', // Adjust the width and height as needed
+              height: '32px',
+              borderRadius: '50%', // Add this if you want a circular image
+              cursor: 'pointer',
+              objectFit: 'contain'
             }}
-            ref={anchorRef}
-            aria-controls={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            color="inherit"
           />
         }
         label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
@@ -133,6 +178,7 @@ const ProfileSection = () => {
         onClick={handleToggle}
         color="primary"
       />
+
       <Popper
         placement="bottom-end"
         open={open}
@@ -159,30 +205,13 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning,</Typography>
+                        <Typography variant="h4">Welcome,</Typography>
                         <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                          Johne Doe
+                          {fullname}
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Project Admin</Typography>
+                      <Typography variant="subtitle2">{username}</Typography>
                     </Stack>
-                    <OutlinedInput
-                      sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
-                      id="input-search-profile"
-                      value={value}
-                      onChange={(e) => setValue(e.target.value)}
-                      placeholder="Search profile options"
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <IconSearch stroke={1.5} size="1rem" color={theme.palette.grey[500]} />
-                        </InputAdornment>
-                      }
-                      aria-describedby="search-helper-text"
-                      inputProps={{
-                        'aria-label': 'weight'
-                      }}
-                    />
-                    <Divider />
                   </Box>
                   <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                     <Box sx={{ p: 2 }}>
@@ -260,7 +289,7 @@ const ProfileSection = () => {
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 1}
-                          onClick={(event) => handleListItemClick(event, 1, '/profile')}
+                          onClick={(event) => handleListItemClick(event, 1, '/account-settings')}
                         >
                           <ListItemIcon>
                             <IconUser stroke={1.5} size="1.3rem" />

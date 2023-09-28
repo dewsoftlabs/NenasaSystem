@@ -1,9 +1,8 @@
 import dashboard from './dashboard';
-import filters from './filters';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [dashboard, filters]
+  items: [dashboard]
 };
 
 export default menuItems;

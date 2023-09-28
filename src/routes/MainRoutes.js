@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { lazy } from 'react';
 
 // project imports
@@ -9,7 +10,7 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')))
 
 // utilities routing
 
-const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
+const CustomerList = Loadable(lazy(() => import('views/pages/customer/CustomerList')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -22,6 +23,10 @@ const MainRoutes = {
       element: <DashboardDefault />
     },
     {
+      path: '/customer-list',
+      element: <CustomerList />
+    },
+    {
       path: 'dashboard',
       children: [
         {
@@ -29,17 +34,7 @@ const MainRoutes = {
           element: <DashboardDefault />
         }
       ]
-    },
-    {
-      path: 'utils',
-      children: [
-        {
-          path: 'util-color',
-          element: <UtilsColor />
-        }
-      ]
     }
-
   ]
 };
 

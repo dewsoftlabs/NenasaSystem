@@ -39,7 +39,6 @@ const NavCollapse = ({ menu, level }) => {
       menu.id !== 'reports' &&
       menu.id !== 'customer' &&
       menu.id !== 'officer' &&
-      menu.id !== 'employee' &&
       menu.children[0] &&
       menu.children[0].url
     ) {
