@@ -65,6 +65,13 @@ const UserSettingsMainPage = () => {
       {
         accessorKey: 'email',
         header: 'Email',
+        Cell: ({ renderedCellValue }) => {
+          return (
+            <>
+              <a href={`mailto:${renderedCellValue}`}>{renderedCellValue}</a>
+            </>
+          );
+        },
         export: true,
         enableEditing: true,
         enableColumnActions: true,
@@ -75,6 +82,23 @@ const UserSettingsMainPage = () => {
       {
         accessorKey: 'phonenumber',
         header: 'Mobile',
+        Cell: ({ renderedCellValue }) => {
+          return (
+            <>
+              <a href={`whatsapp://send?phone=${renderedCellValue}`}> {renderedCellValue}</a>
+            </>
+          );
+        },
+        export: true,
+        enableEditing: true,
+        enableColumnActions: true,
+        minSize: 50,
+        maxSize: 50,
+        size: 50
+      },
+      {
+        accessorKey: 'nic',
+        header: 'NIC',
         export: true,
         enableEditing: true,
         enableColumnActions: true,
@@ -90,7 +114,18 @@ const UserSettingsMainPage = () => {
         enableColumnActions: true,
         minSize: 50,
         maxSize: 50,
-        size: 50
+        size: 50,
+        editVariant: 'select',
+        editSelectOptions: [
+          {
+            value: 'Male',
+            text: 'Male'
+          },
+          {
+            value: 'Female',
+            text: 'Female'
+          }
+        ]
       },
       {
         accessorKey: 'username',
@@ -357,6 +392,10 @@ const UserSettingsMainPage = () => {
     idName: 'userid',
     enableCSVExport: true,
     enablepdf: true,
+    row: {
+      rowSelect: false,
+      rowRedirect: '/loan/loan-detail/'
+    },
     editing: {
       enableEditing: true,
       editionMode: 'row',

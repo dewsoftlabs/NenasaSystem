@@ -20,12 +20,14 @@ const generalDash = {
       title: 'User Settings',
       type: 'item',
       url: '/user-settings',
+      permissionCode: 'admin',
       icon: icons.IconUserCheck,
       breadcrumbs: false
     },
     {
       id: 'permission-settings',
       title: 'Permission Settings',
+      permissionCode: 'superadmin',
       type: 'item',
       url: '/permission-settings',
       icon: icons.IconLockOpen,
@@ -34,6 +36,7 @@ const generalDash = {
     {
       id: 'userrole-settings',
       title: 'Userrole Settings',
+      permissionCode: 'admin',
       type: 'item',
       url: '/userrole-settings',
       icon: icons.IconUserExclamation,

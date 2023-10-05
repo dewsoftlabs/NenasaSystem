@@ -10,6 +10,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import CloseIcon from '@mui/icons-material/Close';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
@@ -185,7 +186,6 @@ function SimpleForm(props) {
 
   const handleChange = (event) => {
     checkValidation(event);
-    console.log(event);
   };
 
   const handleChangeCheckList = (event) => {
@@ -295,7 +295,6 @@ function SimpleForm(props) {
   };
   const checkValidation = (event) => {
     const { name, value, files } = event.target;
-    console.log(files);
     const fieldSchema = formFields.find((field) => field.name === name)?.validation;
 
     let fieldError = null;
@@ -571,27 +570,41 @@ function SimpleForm(props) {
               )}
 
               {field.type === 'checkgroup' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <InputLabel style={{ color: focusedField === field.name ? '#000' : '#000' }}>{field.label}</InputLabel>
-                  <div style={{ marginTop: '50px', padding: '10px' }}>
-                    {field.options.map((option) => (
-                      <FormControlLabel
-                        key={option.value}
-                        control={
-                          <Checkbox
-                            name={field.name}
-                            value={option.label}
-                            onChange={(e) => {
-                              handleChangeCheckList(e);
-                            }}
-                            color="primary"
-                            disabled={field.disableOption === 'disabled' && true}
-                            readOnly={field.disableOption === 'readonly' && true}
-                          />
-                        }
-                        label={option.label}
-                      />
-                    ))}
+                <FormControl
+                  style={{
+                    width: '100%',
+                    padding: '15px',
+                    marginBottom: '15px',
+                    border: '1px solid black',
+                    borderRadius: '10px'
+                  }}
+                >
+                  <Typography>{field.label}</Typography>
+                  <div style={{ marginTop: '10px' }}>
+                    {field.options.length === 0 ? (
+                      <p>
+                        <i>No {field.label} available</i>
+                      </p>
+                    ) : (
+                      field.options.map((option) => (
+                        <FormControlLabel
+                          key={option.value}
+                          control={
+                            <Checkbox
+                              name={field.name}
+                              value={option.label}
+                              onChange={(e) => {
+                                handleChangeCheckList(e);
+                              }}
+                              color="primary"
+                              disabled={field.disableOption === 'disabled' && true}
+                              readOnly={field.disableOption === 'readonly' && true}
+                            />
+                          }
+                          label={option.label}
+                        />
+                      ))
+                    )}
                   </div>
                   {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
                 </FormControl>
@@ -606,7 +619,13 @@ function SimpleForm(props) {
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker
                             color="primary"
-                            value={formData.data[field.name] ? formData.data[field.name] : ''}
+                            value={
+                              formData.data[field.name]
+                                ? dayjs(formData.data[field.name]).isValid()
+                                  ? dayjs(formData.data[field.name])
+                                  : null
+                                : null
+                            }
                             onChange={(e) => {
                               handleDateChange(field.name, e, field.type);
                             }}
@@ -756,7 +775,7 @@ function SimpleForm(props) {
           type="submit"
           style={{ width: '100%', background: '#1790FF', color: 'white', height: '50px', borderRadius: '15px', marginBottom: 10 }}
         >
-          Submit
+          {columns[0].buttonText ? columns[0].buttonText : 'Submit'}
         </Button>
       </form>
     </div>

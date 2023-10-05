@@ -9,6 +9,7 @@ import { ExportToCsv } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { toast } from 'react-toastify';
+import { hasPermission, getUserRoleID } from '../../session';
 import logosrc from '../../assets/images/logo.jpg';
 
 import { IconFileSpreadsheet, IconPlus, IconPdf, IconTrash } from '@tabler/icons-react';
@@ -206,22 +207,23 @@ function SimpleTable(props) {
         onPaginationChange={setPagination}
         renderTopToolbarCustomActions={({ table }) => (
           <Box sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}>
-            {tableSettings.add.enableAddButton == true && (
-              <div>
-                <Button
-                  style={{ color: '#000', backgroundColor: '#ffffff' }}
-                  onClick={() => {
-                    props.handleAddForm();
-                  }}
-                  startIcon={<IconPlus />}
-                  variant="contained"
-                >
-                  {tableSettings.add.addButtonText ? tableSettings.add.addButtonText : 'Add New'}
-                </Button>
-              </div>
-            )}
-            {tableSettings.delete.deleteType === 'multiple' ||
-              (tableSettings.delete.deleteApi !== '' && tableSettings.delete.deleteType === 'mix' && (
+            {(hasPermission(tableSettings.add.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+              tableSettings.add.enableAddButton == true && (
+                <div>
+                  <Button
+                    style={{ color: '#000', backgroundColor: '#ffffff' }}
+                    onClick={() => {
+                      props.handleAddForm();
+                    }}
+                    startIcon={<IconPlus />}
+                    variant="contained"
+                  >
+                    {tableSettings.add.addButtonText ? tableSettings.add.addButtonText : 'Add New'}
+                  </Button>
+                </div>
+              )}
+            {(hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+              (tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix') && (
                 <div>
                   <Button
                     style={{ color: '#000', backgroundColor: '#fff' }}
@@ -234,7 +236,7 @@ function SimpleTable(props) {
                     Delete
                   </Button>
                 </div>
-              ))}
+              )}
             {tableSettings.enableCSVExport && (
               <div>
                 <Button
@@ -261,6 +263,17 @@ function SimpleTable(props) {
             )}
           </Box>
         )}
+        muiTableBodyRowProps={
+          tableSettings.row.rowSelect &&
+          (({ row }) => ({
+            onClick: () => {
+              history(tableSettings.row.rowRedirect + row.id);
+            },
+            sx: {
+              cursor: tableSettings.row.rowSelect ? 'pointer' : 'default'
+            }
+          }))
+        }
         onEditingRowSave={handleSaveRow}
         renderRowActionMenuItems={
           tableSettings.editing.actionMenu.enableActionMenu ||
@@ -268,8 +281,8 @@ function SimpleTable(props) {
           tableSettings.delete.deleteType === 'mix'
             ? ({ row, closeMenu }) => {
                 const deleteMenuItem =
-                  (tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix') &&
-                  tableSettings.delete.singleDeleteApi !== '' ? (
+                  (hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+                  (tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix') ? (
                     <MenuItem
                       key={1}
                       onClick={() => {

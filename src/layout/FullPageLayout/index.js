@@ -12,10 +12,10 @@ import Sidebar from './Sidebar';
 import Customization from '../Customization';
 import navigation from 'menu-items';
 import { drawerWidth } from 'store/constant';
-import { SET_MENU } from 'store/actions';
+import { SET_MENU } from 'store/customization/actions';
 import { useNavigate } from 'react-router-dom';
 
-import { isAuthenticated } from "../../session";
+import { isAuthenticated } from '../../session';
 // assets
 import { IconChevronRight } from '@tabler/icons';
 import { useEffect } from 'react';
@@ -29,13 +29,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
     'margin',
     open
       ? {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen
-      }
+          easing: theme.transitions.easing.easeOut,
+          duration: theme.transitions.duration.enteringScreen
+        }
       : {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen
-      }
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen
+        }
   ),
   [theme.breakpoints.up('md')]: {
     marginLeft: open ? 0 : -(drawerWidth - 20),
@@ -67,10 +67,8 @@ const MainLayout = () => {
     dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
   };
 
-
   useEffect(() => {
     if (!isAuthenticated()) {
-      console.log('here');
       navigate('/login');
     }
   }, []);
