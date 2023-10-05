@@ -11,6 +11,7 @@ import MainCard from 'ui-component/cards/MainCard';
 
 import BranchCustomer from './BranchCustomer';
 import AllCustomer from './AllCustomer';
+import { hasPermission, getUserRoleID } from '../../../session';
 
 import { Box } from '@mui/system';
 
@@ -39,28 +40,38 @@ const UserPermissionSettingsMainPage = () => {
   return (
     <MainCard>
       <Grid container>
-        <Grid item xs={12}>
-          {/* TabList with tabs */}
-          <TabContext value={value}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <TabList onChange={handleTabChange}>
-                <Tab icon={<GroupIcon />} label="All Customers" value="1" />
-                <Tab icon={<GroupAddIcon />} label="Branch Customers" value="2" />
-              </TabList>
-            </Box>
-          </TabContext>
-        </Grid>
-        <Grid item xs={12}>
-          {/* TabPanels with content */}
-          <TabContext value={value}>
-            <TabPanel value="1" sx={{ margin: '10px 0px 0px 0px', padding: 0 }}>
+        {getUserRoleID() == 1 || getUserRoleID() == 2 ? (
+          <>
+            <Grid item xs={12}>
+              {/* TabList with tabs */}
+              <TabContext value={value}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <TabList onChange={handleTabChange}>
+                    <Tab icon={<GroupIcon />} label="All Customers" value="1" />
+                    <Tab icon={<GroupAddIcon />} label="Branch Customers" value="2" />
+                  </TabList>
+                </Box>
+              </TabContext>
+            </Grid>
+            <Grid item xs={12}>
+              {/* TabPanels with content */}
+              <TabContext value={value}>
+                <TabPanel value="1" sx={{ margin: '10px 0px 0px 0px', padding: 0 }}>
+                  <AllCustomer />
+                </TabPanel>
+                <TabPanel value="2" sx={{ margin: '10px 0px 0px 0px', padding: 0 }}>
+                  <BranchCustomer />
+                </TabPanel>
+              </TabContext>
+            </Grid>
+          </>
+        ) : (
+          <>
+            <Grid item xs={12}>
               <AllCustomer />
-            </TabPanel>
-            <TabPanel value="2" sx={{ margin: '10px 0px 0px 0px', padding: 0 }}>
-              <BranchCustomer />
-            </TabPanel>
-          </TabContext>
-        </Grid>
+            </Grid>
+          </>
+        )}
       </Grid>
     </MainCard>
   );

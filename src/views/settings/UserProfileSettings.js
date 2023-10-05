@@ -11,6 +11,7 @@ import Form from '../../components/form/Form';
 import { CircularProgress } from '@mui/material';
 import { LinearProgress } from '@mui/material';
 import defaultProPic from '../../assets/images/default/default-profile-image.png';
+import AddFormModal from 'components/modal/AddFormModal';
 
 const UserPermissionSettingsMainPage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,14 +19,107 @@ const UserPermissionSettingsMainPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [profileImage, setProfileImage] = useState('');
+  const [isOpenPassChnage, setIsOpenPassChnage] = useState(false);
+  const [isOpenEmailChnage, setIsOpenEmailChnage] = useState(false);
 
   const [formData, setFormData] = useState({
     data: {},
     errors: {}
   });
 
+  const [changeEmailFormData, setChangeEmailFormData] = useState({
+    data: {},
+    errors: {}
+  });
+
+  const [changePasswordFormData, setChangePasswordFormData] = useState({
+    data: {},
+    errors: {}
+  });
+
   const updateEditMode = () => {
     setIsEditing(true);
+  };
+
+  const handleChangePassword = () => {
+    setIsOpenPassChnage(true);
+  };
+
+  const handleChangeEmail = () => {
+    setIsOpenEmailChnage(true);
+  };
+
+  const changeEmailformSubmit = async (e) => {
+    try {
+      setIsLoading(true);
+
+      const response = await Axios.put(`${process.env.REACT_APP_API_ENDPOINT}/user/me/changeEmail/${getUserid()}`, e.data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': getToken()
+        }
+      });
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        fetchData();
+        logout();
+        showToast(response.data.message);
+      } else if (response.status === 401) {
+        logout();
+      } else {
+        fetchData();
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.status === 401) {
+        window.location.reload();
+        logout();
+      } else {
+        showToast(error.response?.data.error || 'An error occurred', 'warn');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changePasswordformSubmit = async (e) => {
+    try {
+      setIsLoading(true);
+
+      const response = await Axios.put(`${process.env.REACT_APP_API_ENDPOINT}/user/me/changePassword/${getUserid()}`, e.data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': getToken()
+        }
+      });
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        fetchData();
+        logout();
+        showToast(response.data.message);
+      } else if (response.status === 401) {
+        logout();
+      } else {
+        fetchData();
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.status === 401) {
+        window.location.reload();
+        logout();
+      } else {
+        showToast(error.response?.data.error || 'An error occurred', 'warn');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleConfirmClose = () => {
+    setIsOpenEmailChnage(false);
+    setIsOpenPassChnage(false);
   };
 
   const exitEditMode = () => {
@@ -212,18 +306,6 @@ const UserPermissionSettingsMainPage = () => {
             }
           },
           {
-            accessorKey: 'email',
-            header: 'Email',
-            formField: {
-              isFormField: true,
-              disableOption: 'default', // readonly | disabled | default
-              type: 'text', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 12,
-              isRequired: true,
-              validationType: 'email' // default | custom
-            }
-          },
-          {
             accessorKey: 'gender',
             header: 'Gender',
             formField: {
@@ -255,6 +337,96 @@ const UserPermissionSettingsMainPage = () => {
               xs: 12,
               isRequired: true,
               validationType: 'default' // default | custom
+            }
+          }
+        ]
+      }
+    ],
+    []
+  );
+
+  const changeEmailForm = useMemo(
+    () => [
+      {
+        formName: 'emailchange',
+        formHeading: 'Change Email',
+        headingVariant: 'h3',
+        buttonText: 'Save',
+        fields: [
+          {
+            accessorKey: 'currentEmail',
+            header: 'Current Email',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'email', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              value: '',
+              isRequired: true,
+              validationType: 'email' // default | custom
+            }
+          },
+          {
+            accessorKey: 'newEmail',
+            header: 'New Email',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'email', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              isRequired: true,
+              validationType: 'email' // default | custom
+            }
+          }
+        ]
+      }
+    ],
+    []
+  );
+
+  const changePasswordForm = useMemo(
+    () => [
+      {
+        formName: 'passwordchange',
+        formHeading: 'Change Password',
+        headingVariant: 'h3',
+        buttonText: 'Save',
+        fields: [
+          {
+            accessorKey: 'currentPassword',
+            header: 'Current Password',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'password', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              value: '',
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
+            accessorKey: 'password',
+            header: 'New Password',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'password', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              isRequired: true,
+              validationType: 'password' // default | custom
+            }
+          },
+          {
+            accessorKey: 'confirm_password',
+            header: 'Confirm Password',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'password', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 12,
+              isRequired: true,
+              validationType: 'password' // default | custom
             }
           }
         ]
@@ -303,6 +475,7 @@ const UserPermissionSettingsMainPage = () => {
         if (response.status === 200) {
           fetchData();
           showToast(response.data.message);
+          window.location.reload();
         }
       } catch (error) {
         if (error.response.status === 401) {
@@ -407,7 +580,7 @@ const UserPermissionSettingsMainPage = () => {
                       style={{ marginLeft: '10px' }}
                       type="button"
                       className="custom-form-image-upload-button"
-                      onClick={updateEditMode}
+                      onClick={handleChangePassword}
                     >
                       Change Password
                     </Button>
@@ -417,7 +590,7 @@ const UserPermissionSettingsMainPage = () => {
                       style={{ marginLeft: '10px' }}
                       type="button"
                       className="custom-form-image-upload-button"
-                      onClick={updateEditMode}
+                      onClick={handleChangeEmail}
                     >
                       Change Email
                     </Button>
@@ -464,6 +637,29 @@ const UserPermissionSettingsMainPage = () => {
               </div>
             )}
           </Grid>
+          {isOpenEmailChnage && (
+            <AddFormModal
+              enableAddButton={true}
+              columns={changeEmailForm}
+              formData={changeEmailFormData}
+              isOpen={isOpenEmailChnage}
+              setFormData={setChangeEmailFormData}
+              formSubmit={changeEmailformSubmit}
+              handleClose={handleConfirmClose}
+            />
+          )}
+
+          {isOpenPassChnage && (
+            <AddFormModal
+              enableAddButton={true}
+              columns={changePasswordForm}
+              formData={changePasswordFormData}
+              isOpen={isOpenPassChnage}
+              setFormData={setChangePasswordFormData}
+              formSubmit={changePasswordformSubmit}
+              handleClose={handleConfirmClose}
+            />
+          )}
         </Grid>
       )}
     </MainCard>

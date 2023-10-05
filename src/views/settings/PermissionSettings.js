@@ -118,6 +118,10 @@ const UserPermissionSettingsMainPage = () => {
     idName: 'permissionid',
     enableCSVExport: false,
     enablepdf: false,
+    row: {
+      rowSelect: false,
+      rowRedirect: ''
+    },
     editing: {
       enableEditing: true,
       editionMode: 'row',

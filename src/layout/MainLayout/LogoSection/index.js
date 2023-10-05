@@ -34,7 +34,7 @@ const LogoSection = () => {
           height: '32px',
           borderRadius: '50%',
           overflow: 'hidden',
-          marginRight: '12px',
+          marginRight: '12px'
         }}
       >
         {loading ? ( // Conditionally render loading indicator
@@ -46,7 +46,7 @@ const LogoSection = () => {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: 'cover'
             }}
           />
         )}

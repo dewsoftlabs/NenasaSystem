@@ -8,7 +8,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import Table from '../../../components/table/Table'; // Update this with the actual path to your SimpleTable component
 import { getToken, getUserBranchID, logout } from '../../../session'; // Import these functions if needed
 
-const UserSettingsMainPage = () => {
+const BranchCustomer = () => {
   const [customer, setCustomer] = useState([]);
   const [isLoading, setisLoading] = useState(true);
   const [route, setRoute] = useState([]);
@@ -43,6 +43,15 @@ const UserSettingsMainPage = () => {
 
   const columns = useMemo(
     () => [
+      {
+        accessorKey: 'branch_name',
+        header: 'Branch',
+        export: true,
+        enableColumnActions: true,
+        minSize: 90,
+        maxSize: 360,
+        size: 150
+      },
       {
         accessorKey: 'customer_name',
         header: 'Full Name',
@@ -305,7 +314,7 @@ const UserSettingsMainPage = () => {
 
   const table = {
     table: 'Customer',
-    tableType: 'simple',
+    tableType: 'advance',
     heading: 'Customer Table',
     enableHeading: false,
     enableCopy: true,
@@ -314,8 +323,18 @@ const UserSettingsMainPage = () => {
     idName: 'customer_id',
     enableCSVExport: true,
     enablepdf: true,
+    row: {
+      rowSelect: false,
+      rowRedirect: ''
+    },
+    group: {
+      enableGroup: true,
+      groupColumn: ['branch_name'], //eg ['role', 'status']
+      expanded: true
+    },
     editing: {
       enableEditing: true,
+      permissionCode: 'customeredit',
       editionMode: 'row',
       actionMenu: {
         enableActionMenu: true,
@@ -334,8 +353,8 @@ const UserSettingsMainPage = () => {
       },
       updateApi: '/customer/update/'
     },
-
     delete: {
+      permissionCode: 'customerdelete',
       deleteType: 'mix', //single | multiple | mix
       deleteApi: '/customer/delete/',
       singleDeleteApi: '/customer/delete/'
@@ -346,6 +365,7 @@ const UserSettingsMainPage = () => {
     },
     add: {
       enableAddButton: false,
+      permissionCode: '',
       addButtonText: '',
       addApi: '/customer/create'
     }
@@ -401,4 +421,4 @@ const UserSettingsMainPage = () => {
   );
 };
 
-export default UserSettingsMainPage;
+export default BranchCustomer;

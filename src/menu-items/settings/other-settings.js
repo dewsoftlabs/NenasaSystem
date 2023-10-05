@@ -19,6 +19,7 @@ const generalDash = {
       type: 'item',
       url: '/types',
       icon: icons.IconMenu2,
+      permissionCode: 'types',
       breadcrumbs: false
     },
     {
@@ -27,6 +28,7 @@ const generalDash = {
       type: 'item',
       url: '/filters',
       icon: icons.IconFilters,
+      permissionCode: 'filters',
       breadcrumbs: false
     }
   ]

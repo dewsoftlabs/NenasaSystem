@@ -117,6 +117,10 @@ const UserPermissionSettingsMainPage = () => {
     idName: 'depositType_id',
     enableCSVExport: true,
     enablepdf: true,
+    row: {
+      rowSelect: false,
+      rowRedirect: ''
+    },
     editing: {
       enableEditing: true,
       editionMode: 'row',

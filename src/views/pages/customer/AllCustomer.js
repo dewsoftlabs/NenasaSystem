@@ -314,6 +314,10 @@ const UserSettingsMainPage = () => {
     idName: 'customer_id',
     enableCSVExport: true,
     enablepdf: true,
+    row: {
+      rowSelect: false,
+      rowRedirect: ''
+    },
     editing: {
       enableEditing: true,
       editionMode: 'row',
@@ -336,6 +340,7 @@ const UserSettingsMainPage = () => {
     },
 
     delete: {
+      permissionCode: 'customerdelete',
       deleteType: 'mix', //single | multiple | mix
       deleteApi: '/customer/delete/',
       singleDeleteApi: '/customer/delete/'

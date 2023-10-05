@@ -337,6 +337,10 @@ const UserRoleSettingsMainPage = () => {
     idName: 'assignpermissionid',
     enableCSVExport: true,
     enablepdf: true,
+    row: {
+      rowSelect: false,
+      rowRedirect: '/loan/loan-detail/'
+    },
     group: {
       enableGroup: true,
       groupColumn: ['role'], //eg ['role', 'status']
@@ -382,6 +386,7 @@ const UserRoleSettingsMainPage = () => {
       positionPagination: 'bottom'
     },
     add: {
+      permissionCode: '',
       enableAddButton: true,
       addButtonText: 'Add User Role', //use default keep empty
       addApi: '/userrole/create'

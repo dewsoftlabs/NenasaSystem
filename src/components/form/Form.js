@@ -10,6 +10,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import CloseIcon from '@mui/icons-material/Close';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import dayjs from 'dayjs';
 import {
   Button,
   Checkbox,
@@ -185,7 +186,6 @@ function SimpleForm(props) {
 
   const handleChange = (event) => {
     checkValidation(event);
-    console.log(event);
   };
 
   const handleChangeCheckList = (event) => {
@@ -295,7 +295,6 @@ function SimpleForm(props) {
   };
   const checkValidation = (event) => {
     const { name, value, files } = event.target;
-    console.log(files);
     const fieldSchema = formFields.find((field) => field.name === name)?.validation;
 
     let fieldError = null;
@@ -620,7 +619,13 @@ function SimpleForm(props) {
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker
                             color="primary"
-                            value={formData.data[field.name] ? formData.data[field.name] : ''}
+                            value={
+                              formData.data[field.name]
+                                ? dayjs(formData.data[field.name]).isValid()
+                                  ? dayjs(formData.data[field.name])
+                                  : null
+                                : null
+                            }
                             onChange={(e) => {
                               handleDateChange(field.name, e, field.type);
                             }}

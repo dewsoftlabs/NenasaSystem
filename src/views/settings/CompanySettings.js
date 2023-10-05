@@ -10,6 +10,7 @@ import { getToken, logout } from '../../session'; // Import these functions if n
 import Form from '../../components/form/Form';
 import { CircularProgress } from '@mui/material';
 import { LinearProgress } from '@mui/material';
+import { hasPermission, getUserRoleID } from '../../session';
 
 const UserPermissionSettingsMainPage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -304,6 +305,7 @@ const UserPermissionSettingsMainPage = () => {
         if (response.status === 200) {
           fetchData();
           showToast(response.data.message);
+          window.location.reload();
         }
       } catch (error) {
         if (error.response.status === 401) {
@@ -370,35 +372,39 @@ const UserPermissionSettingsMainPage = () => {
                       <strong>Instagram:</strong> {formData.data.instragram}
                     </Typography>
                     <Typography variant="body1" style={{ marginTop: '20px' }}>
-                      <strong>WhatsApp:</strong> <a href={`whatsapp://send?phone=${formData.data.whatsapp}`}> {formData.data.whatsapp}</a> 
+                      <strong>WhatsApp:</strong> <a href={`whatsapp://send?phone=${formData.data.whatsapp}`}> {formData.data.whatsapp}</a>
                     </Typography>
                   </div>
                 </div>
               )}
               <div style={{ marginTop: '10px' }}>
-                {isEditing ? (
+                {(hasPermission('companyedit') || getUserRoleID() == 1 || getUserRoleID() == 2) && (
                   <>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="button"
-                      className="custom-form-image-upload-button"
-                      onClick={exitEditMode}
-                    >
-                      Back to Main
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="button"
-                      className="custom-form-image-upload-button"
-                      onClick={updateEditMode}
-                    >
-                      Edit Company Details
-                    </Button>
+                    {isEditing ? (
+                      <>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="button"
+                          className="custom-form-image-upload-button"
+                          onClick={exitEditMode}
+                        >
+                          Back to Main
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="button"
+                          className="custom-form-image-upload-button"
+                          onClick={updateEditMode}
+                        >
+                          Edit Company Details
+                        </Button>
+                      </>
+                    )}
                   </>
                 )}
               </div>

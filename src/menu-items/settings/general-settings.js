@@ -19,6 +19,7 @@ const generalDash = {
       type: 'item',
       url: '/company-settings',
       icon: icons.IconBuildingStore,
+      permissionCode: '',
       breadcrumbs: false
     },
     {
@@ -27,6 +28,7 @@ const generalDash = {
       type: 'item',
       url: '/branch-settings',
       icon: icons.IconCategoryFilled,
+      permissionCode: 'admin',
       breadcrumbs: false
     }
   ]

@@ -9,7 +9,7 @@ import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Typography 
 
 // project imports
 import NavItem from '../NavItem';
-
+import { hasPermission, getUserRoleID } from '../../../../../session';
 // assets
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons';
@@ -77,17 +77,20 @@ const NavCollapse = ({ menu, level }) => {
 
   // menu collapse & item
   const menus = menu.children?.map((item) => {
-    switch (item.type) {
-      case 'collapse':
-        return <NavCollapse key={item.id} menu={item} level={level + 1} />;
-      case 'item':
-        return <NavItem key={item.id} item={item} level={level + 1} />;
-      default:
-        return (
-          <Typography key={item.id} variant="h6" color="error" align="center">
-            Menu Items Error
-          </Typography>
-        );
+    console.log(item.permissionCode);
+    if (item.permissionCode == '' || hasPermission(item.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) {
+      switch (item.type) {
+        case 'collapse':
+          return <NavCollapse key={item.id} menu={item} level={level + 1} />;
+        case 'item':
+          return <NavItem key={item.id} item={item} level={level + 1} />;
+        default:
+          return (
+            <Typography key={item.id} variant="h6" color="error" align="center">
+              Menu Items Error
+            </Typography>
+          );
+      }
     }
   });
 

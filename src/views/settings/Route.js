@@ -131,6 +131,10 @@ const CategorySettingsMainPage = () => {
     idName: 'routeid',
     enableCSVExport: true,
     enablepdf: true,
+    row: {
+      rowSelect: false,
+      rowRedirect: '/loan/loan-detail/'
+    },
     editing: {
       enableEditing: true,
       editionMode: 'row',

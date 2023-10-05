@@ -16,6 +16,7 @@ const generalDash = {
       title: 'Acoount',
       type: 'item',
       url: '/account-settings',
+      permissionCode: '',
       icon: icons.IconUserCog,
       breadcrumbs: false
     }
