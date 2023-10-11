@@ -68,6 +68,9 @@ const TargersSettingsMainPage = () => {
         formName: 'targetadd',
         formHeading: 'Targets Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'target_amount',

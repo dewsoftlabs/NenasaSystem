@@ -267,6 +267,9 @@ const UserPermissionSettingsMainPage = () => {
         formHeading: 'Branch Create Form',
         headingVariant: 'h3',
         buttonText: 'Save',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'fullname',
@@ -352,6 +355,9 @@ const UserPermissionSettingsMainPage = () => {
         formHeading: 'Change Email',
         headingVariant: 'h3',
         buttonText: 'Save',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'currentEmail',
@@ -391,6 +397,9 @@ const UserPermissionSettingsMainPage = () => {
         formHeading: 'Change Password',
         headingVariant: 'h3',
         buttonText: 'Save',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'currentPassword',

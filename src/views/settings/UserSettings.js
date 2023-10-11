@@ -216,6 +216,9 @@ const UserSettingsMainPage = () => {
         formName: 'useradd',
         formHeading: 'User Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'fullname',

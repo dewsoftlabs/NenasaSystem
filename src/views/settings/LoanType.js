@@ -59,6 +59,9 @@ const UserPermissionSettingsMainPage = () => {
         formName: 'loan_typeadd',
         formHeading: 'Loan Type Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'loantype_name',

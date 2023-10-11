@@ -69,6 +69,9 @@ const UserPermissionSettingsMainPage = () => {
         formName: 'permissopmadd',
         formHeading: 'Permission Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'permission_code',

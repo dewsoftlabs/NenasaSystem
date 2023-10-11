@@ -68,6 +68,9 @@ const UserPermissionSettingsMainPage = () => {
         formName: 'depositTypeadd',
         formHeading: 'Deposit Type Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'depositType_name',
