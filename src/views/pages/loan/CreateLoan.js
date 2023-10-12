@@ -516,8 +516,8 @@ const CreateLoan = () => {
             }))
           },
           {
-            accessorKey: 'hold_period',
-            header: 'Hold Period',
+            accessorKey: 'loan_period',
+            header: 'Loan Type Period',
             formField: {
               isFormField: true,
               disableOption: 'default', // readonly | disabled
@@ -606,7 +606,7 @@ const CreateLoan = () => {
             header: 'Total Pay Amount',
             formField: {
               isFormField: true,
-              disableOption: 'disabled', // readonly | disabled
+              disableOption: 'default', // readonly | disabled
               type: 'number', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
               xs: 6,
               isRequired: true,
@@ -711,6 +711,8 @@ const CreateLoan = () => {
   };
   // Example of using showToast with a reload callback
 
+  console.log(loanData.data);
+
   return (
     <MainCard>
       {isLoading && (
@@ -802,11 +804,11 @@ const CreateLoan = () => {
                 </Box>
               ) : count === 3 ? (
                 <Box sx={{ width: '100%', padding: '50px 0px 0px 0px' }}>
-                  {loanData == 1 ? (
+                  {loanData.data.loan_period == 1 ? (
                     <MarkedDatesCalendar setData={setCollection} data={collection} />
-                  ) : loanData == 2 ? (
+                  ) : loanData.data.loan_period == 2 ? (
                     <MarkWeek setData={setCollection} data={collection} />
-                  ) : loanData == 3 ? (
+                  ) : loanData.data.loan_period == 3 ? (
                     <MarkMonths setData={setCollection} data={collection} />
                   ) : (
                     <></>

@@ -213,7 +213,7 @@ function SimpleForm(props) {
     }
 
     if (name === 'document_charge' || name === 'service_charge' || name === 'deposit_amount') {
-      // calculateTotalPayable(event);
+      calculateTotalPayable(event);
     }
   };
 
@@ -229,11 +229,11 @@ function SimpleForm(props) {
         setFormData((prevState) => ({
           data: {
             ...prevState.data,
-            total_payable: total_payable
+            total_payamount: total_payable
           },
           errors: {
             ...prevState.errors,
-            total_payable: fieldError
+            total_payamount: fieldError
           }
         }));
       }
@@ -245,11 +245,11 @@ function SimpleForm(props) {
         setFormData((prevState) => ({
           data: {
             ...prevState.data,
-            total_payable: total_payable
+            total_payamount: total_payable
           },
           errors: {
             ...prevState.errors,
-            total_payable: fieldError
+            total_payamount: fieldError
           }
         }));
       }
@@ -260,11 +260,11 @@ function SimpleForm(props) {
         setFormData((prevState) => ({
           data: {
             ...prevState.data,
-            total_payable: total_payable
+            total_payamount: total_payable
           },
           errors: {
             ...prevState.errors,
-            total_payable: fieldError
+            total_payamount: fieldError
           }
         }));
       }
