@@ -31,6 +31,23 @@ export const theme = (customization) => {
     customization
   };
 
+  // const color = customization.darkMode ? colors : colors; // Update to your dark color module if needed
+
+  // const themeOption = {
+  //   colors: color,
+  //   heading: customization.darkMode ? color.warningDark : color.grey900,
+  //   paper: customization.darkMode ? color.darkPaper : color.paper,
+  //   backgroundDefault: customization.darkMode ? color.darkPaper : color.paper,
+  //   background: customization.darkMode ? color.darkBackground : color.primaryLight,
+  //   darkTextPrimary: customization.darkMode ? color.darkPrimaryLight : color.grey700,
+  //   darkTextSecondary: customization.darkMode ? color.darkPrimaryLight : color.grey500,
+  //   textDark: customization.darkMode ? color.grey900 : color.grey900,
+  //   menuSelected: customization.darkMode ? color.warningDark : color.secondaryDark,
+  //   menuSelectedBack: customization.darkMode ? color.darkPaper : color.secondaryLight,
+  //   divider: customization.darkMode ? color.darkBackground : color.grey200,
+  //   customization
+  // };
+
   const themeOptions = {
     direction: 'ltr',
     palette: themePalette(themeOption),

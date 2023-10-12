@@ -117,34 +117,44 @@ function SimpleForm(props) {
   const { enableAddButton, columns, formData, setFormData, formSubmit, isOpen, handleClose } = props;
 
   const handleValidation = (validationType, field) => {
-    if (validationType === 'mobile') {
-      const validation = Yup.string()
-        .matches(/^[+]\d{1,3}\s?(\d{10}|\d{12})$/, {
-          message: 'Invalid mobile number',
-          excludeEmptyString: true
-        })
-        .required('This field is required');
+    if (!field) {
+      console.error('Field object is missing.');
+      return;
+    }
 
+    if (validationType === 'mobile') {
+      const baseValidation = Yup.string().matches(/^[+]\d{1,3}\s?(\d{10}|\d{12})$/, {
+        message: 'Invalid mobile number',
+        excludeEmptyString: true
+      });
+
+      const validation = field.isrequired ? baseValidation.required('This field is required') : baseValidation;
       field.validation = validation;
     } else if (validationType === 'email') {
-      const validation = Yup.string().email('Invalid email address').required('This field is required');
+      const baseValidation = Yup.string().email('Invalid email address');
+
+      const validation = field.isrequired ? baseValidation.required('This field is required') : baseValidation;
       field.validation = validation;
     } else if (validationType === 'password') {
       field.validation = passwordSchema;
     } else if (validationType === 'file') {
       field.validation = imageSchema;
     } else if (validationType === 'nic') {
-      const validation = Yup.string()
-        .matches(/^[A-Za-z0-9]{10,12}$/, {
-          message: 'NIC number must be between 10 and 12 alphanumeric characters',
-          excludeEmptyString: true
-        })
-        .required('This field is required');
+      const baseValidation = Yup.string().matches(/^[A-Za-z0-9]{10,12}$/, {
+        message: 'NIC number must be between 10 and 12 alphanumeric characters',
+        excludeEmptyString: true
+      });
+      const validation = field.isrequired ? baseValidation.required('This field is required') : baseValidation;
 
       field.validation = validation;
-    } else if (field.isrequired === true) {
-      const validation = Yup.string().required('This field is required');
-      field.validation = validation;
+    }
+
+    if (field.isrequired === true) {
+      const baseValidation = Yup.string();
+
+      field.validation = field.validation
+        ? field.validation.concat(baseValidation.required('This field is required'))
+        : baseValidation.required('This field is required');
     }
   };
 
@@ -411,11 +421,11 @@ function SimpleForm(props) {
                 <FormControl style={{ width: '100%', marginBottom: '15px' }}>
                   <InputLabel
                     style={{
-                      backgroundColor: '#fff',
+                      backgroundColor: '#000',
                       borderRadius: '5px !important',
                       marginLeft: '8px !important',
                       marginRight: '8px !important',
-                      color: focusedField === field.name ? '#000' : '#000'
+                      color: focusedField === field.name ? '#fff' : '#fff'
                     }}
                   >
                     {field.label}

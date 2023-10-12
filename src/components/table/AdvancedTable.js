@@ -182,143 +182,141 @@ function SimpleTable(props) {
   }, [pagination.pageIndex, pagination.pageSize]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <MaterialReactTable
-        columns={props.columns}
-        data={props.dataSet}
-        enableGrouping={tableSettings.group.enableGroup}
-        enableStickyHeader
-        enableStickyFooter
-        initialState={{
-          density: 'compact',
-          expanded: tableSettings.group.expanded, //expand all groups by default
-          grouping: tableSettings.group.groupColumn
-        }}
-        getRowId={(row) => row[tableSettings.idName]}
-        enableEditing={tableSettings.editing.enableEditing}
-        editingMode={tableSettings.editing.editionMode}
-        enablePagination={tableSettings.pagination.enablePagination}
-        positionPagination={tableSettings.pagination.positionPagination}
-        enableRowSelection={tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix' ? true : false}
-        state={{
-          isLoading: props.isLoading,
-          pagination
-        }}
-        onPaginationChange={setPagination}
-        renderTopToolbarCustomActions={({ table }) => (
-          <Box sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}>
-            {(hasPermission(tableSettings.add.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
-              tableSettings.add.enableAddButton == true && (
-                <div>
-                  <Button
-                    style={{ color: '#000', backgroundColor: '#ffffff' }}
-                    onClick={() => {
-                      props.handleAddForm();
-                    }}
-                    startIcon={<IconPlus />}
-                    variant="contained"
-                  >
-                    {tableSettings.add.addButtonText ? tableSettings.add.addButtonText : 'Add New'}
-                  </Button>
-                </div>
-              )}
-            {(hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
-              (tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix') && (
-                <div>
-                  <Button
-                    style={{ color: '#000', backgroundColor: '#fff' }}
-                    onClick={() => {
-                      props.deleteOpen(tableInstanceRef.current?.getSelectedRowModel().rows);
-                    }}
-                    startIcon={<DeleteOutlineOutlinedIcon />}
-                    variant="contained"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              )}
-            {tableSettings.enableCSVExport && (
+    <MaterialReactTable
+      columns={props.columns}
+      data={props.dataSet}
+      enableGrouping={tableSettings.group.enableGroup}
+      enableStickyHeader
+      enableStickyFooter
+      initialState={{
+        density: 'compact',
+        expanded: tableSettings.group.expanded, //expand all groups by default
+        grouping: tableSettings.group.groupColumn
+      }}
+      getRowId={(row) => row[tableSettings.idName]}
+      enableEditing={tableSettings.editing.enableEditing}
+      editingMode={tableSettings.editing.editionMode}
+      enablePagination={tableSettings.pagination.enablePagination}
+      positionPagination={tableSettings.pagination.positionPagination}
+      enableRowSelection={tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix' ? true : false}
+      state={{
+        isLoading: props.isLoading,
+        pagination
+      }}
+      onPaginationChange={setPagination}
+      renderTopToolbarCustomActions={({ table }) => (
+        <Box sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}>
+          {(hasPermission(tableSettings.add.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+            tableSettings.add.enableAddButton == true && (
               <div>
                 <Button
-                  style={{ color: '#000', backgroundColor: '#fff' }}
-                  onClick={handleExportData}
-                  startIcon={<IconFileSpreadsheet />}
+                  style={{ color: '#000', backgroundColor: '#ffffff' }}
+                  onClick={() => {
+                    props.handleAddForm();
+                  }}
+                  startIcon={<IconPlus />}
                   variant="contained"
                 >
-                  CSV / Excel
+                  {tableSettings.add.addButtonText ? tableSettings.add.addButtonText : 'Add New'}
                 </Button>
               </div>
             )}
-            {tableSettings.enablepdf && (
+          {(hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+            (tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix') && (
               <div>
                 <Button
                   style={{ color: '#000', backgroundColor: '#fff' }}
-                  onClick={handleExportPDF}
-                  startIcon={<IconPdf />}
+                  onClick={() => {
+                    props.deleteOpen(tableInstanceRef.current?.getSelectedRowModel().rows);
+                  }}
+                  startIcon={<DeleteOutlineOutlinedIcon />}
                   variant="contained"
                 >
-                  PDF
+                  Delete
                 </Button>
               </div>
             )}
-          </Box>
-        )}
-        muiTableBodyRowProps={
-          tableSettings.row.rowSelect &&
-          (({ row }) => ({
-            onClick: () => {
-              history(tableSettings.row.rowRedirect + row.id);
-            },
-            sx: {
-              cursor: tableSettings.row.rowSelect ? 'pointer' : 'default'
-            }
-          }))
-        }
-        onEditingRowSave={handleSaveRow}
-        renderRowActionMenuItems={
-          tableSettings.editing.actionMenu.enableActionMenu ||
-          tableSettings.delete.deleteType === 'single' ||
-          tableSettings.delete.deleteType === 'mix'
-            ? ({ row, closeMenu }) => {
-                const deleteMenuItem =
-                  (hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
-                  (tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix') ? (
-                    <MenuItem
-                      key={1}
-                      onClick={() => {
-                        props.deleteOpen(row.id);
-                        closeMenu();
-                      }}
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                    >
-                      <IconTrash /> {tableSettings.delete.deleteText ? tableSettings.delete.deleteText : 'Delete'}
-                    </MenuItem>
-                  ) : null;
-
-                const actionMenuItems = tableSettings.editing.actionMenu.actionMenudata.map((menuItem, index) => (
+          {tableSettings.enableCSVExport && (
+            <div>
+              <Button
+                style={{ color: '#000', backgroundColor: '#fff' }}
+                onClick={handleExportData}
+                startIcon={<IconFileSpreadsheet />}
+                variant="contained"
+              >
+                CSV / Excel
+              </Button>
+            </div>
+          )}
+          {tableSettings.enablepdf && (
+            <div>
+              <Button
+                style={{ color: '#000', backgroundColor: '#fff' }}
+                onClick={handleExportPDF}
+                startIcon={<IconPdf />}
+                variant="contained"
+              >
+                PDF
+              </Button>
+            </div>
+          )}
+        </Box>
+      )}
+      muiTableBodyRowProps={
+        tableSettings.row.rowSelect &&
+        (({ row }) => ({
+          onClick: () => {
+            history(tableSettings.row.rowRedirect + row.id);
+          },
+          sx: {
+            cursor: tableSettings.row.rowSelect ? 'pointer' : 'default'
+          }
+        }))
+      }
+      onEditingRowSave={handleSaveRow}
+      renderRowActionMenuItems={
+        tableSettings.editing.actionMenu.enableActionMenu ||
+        tableSettings.delete.deleteType === 'single' ||
+        tableSettings.delete.deleteType === 'mix'
+          ? ({ row, closeMenu }) => {
+              const deleteMenuItem =
+                (hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+                (tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix') ? (
                   <MenuItem
-                    key={index + 2} // Start the key from 2 to avoid conflicts with the deleteMenuItem key
+                    key={1}
                     onClick={() => {
-                      menuItem.action(row);
+                      props.deleteOpen(row.id);
                       closeMenu();
                     }}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                   >
-                    {menuItem.icon} {menuItem.menuName}
+                    <IconTrash /> {tableSettings.delete.deleteText ? tableSettings.delete.deleteText : 'Delete'}
                   </MenuItem>
-                ));
+                ) : null;
 
-                return [...actionMenuItems, deleteMenuItem];
-              }
-            : null // If action menu is not enabled, set to null
-        }
-        positionActionsColumn={tableSettings.editing.actionMenu.positionActionsColumn}
-        enableClickToCopy={tableSettings.enableCopy}
-        enableRowNumbers={tableSettings.enableRowNumbers}
-        tableInstanceRef={tableInstanceRef}
-        enableRowActions={tableSettings.rowAction}
-      />
-    </ThemeProvider>
+              const actionMenuItems = tableSettings.editing.actionMenu.actionMenudata.map((menuItem, index) => (
+                <MenuItem
+                  key={index + 2} // Start the key from 2 to avoid conflicts with the deleteMenuItem key
+                  onClick={() => {
+                    menuItem.action(row);
+                    closeMenu();
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  {menuItem.icon} {menuItem.menuName}
+                </MenuItem>
+              ));
+
+              return [...actionMenuItems, deleteMenuItem];
+            }
+          : null // If action menu is not enabled, set to null
+      }
+      positionActionsColumn={tableSettings.editing.actionMenu.positionActionsColumn}
+      enableClickToCopy={tableSettings.enableCopy}
+      enableRowNumbers={tableSettings.enableRowNumbers}
+      tableInstanceRef={tableInstanceRef}
+      enableRowActions={tableSettings.rowAction}
+    />
   );
 }
 

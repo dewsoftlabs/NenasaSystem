@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+// import Brightness4Icon from '@mui/icons-material/Brightness4';
+// import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -38,6 +40,14 @@ const Customization = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const customization = useSelector((state) => state.customization);
+
+  // const [darkMode, setDarkMode] = useState(customization.darkMode);
+
+  // function to toggle dark mode
+  // const toggleDarkMode = () => {
+  //   dispatch({ type: TOGGLE_DARK_MODE });
+  //   setDarkMode(!darkMode);
+  // };
 
   // drawer on/off
   const [open, setOpen] = useState(false);
@@ -88,9 +98,42 @@ const Customization = () => {
     dispatch({ type: SET_FONT_FAMILY, fontFamily: newFont });
   }, [dispatch, fontFamily]);
 
+  // useEffect(() => {
+  //   if (darkMode) {
+  //     // Apply your logic to activate dark theme here
+  //     // This could include updating styles or dispatching actions
+  //   }
+  // }, [darkMode]);
+
   return (
     <>
       {/* toggle button */}
+      {/* <Tooltip title="Toggle Dark Mode">
+        <Fab
+          component="div"
+          onClick={toggleDarkMode}
+          size="medium"
+          variant="circular"
+          color={darkMode ? 'primary' : 'secondary'}
+          sx={{
+            borderRadius: 0,
+            borderTopLeftRadius: '50%',
+            borderBottomLeftRadius: '50%',
+            borderTopRightRadius: '50%',
+            borderBottomRightRadius: '4px',
+            top: '15%',
+            position: 'fixed',
+            right: 10,
+            zIndex: theme.zIndex.speedDial
+          }}
+        >
+          <AnimateButton type="fadeIn">
+            <IconButton color="inherit" size="large">
+              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </AnimateButton>
+        </Fab>
+      </Tooltip> */}
       <Tooltip title="Live Customize">
         <Fab
           component="div"
@@ -132,7 +175,7 @@ const Customization = () => {
           <Grid container spacing={gridSpacing} sx={{ p: 3 }}>
             <Grid item xs={12}>
               {/* font family */}
-              <SubCard title="Font Family">
+              <SubCard title="Theme Mode">
                 <FormControl>
                   <RadioGroup
                     aria-label="font-family"

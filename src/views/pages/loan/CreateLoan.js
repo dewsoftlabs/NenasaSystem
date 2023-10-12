@@ -1,7 +1,18 @@
 // UserSettingsMainPage.jsx
 
 /* eslint-disable no-unused-vars */
-import { Button, Grid, LinearProgress, Typography } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  LinearProgress,
+  MenuItem,
+  Select,
+  Typography
+} from '@mui/material';
 import Axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -14,8 +25,11 @@ import DialogBox from '../../../components/Alert/Confirm';
 import 'react-toastify/dist/ReactToastify.css';
 import { getToken, logout, getUserBranchID, getUserid } from '../../../session';
 import StepForm from '../../../components/form/LoanCreateForm';
+import MarkedDatesCalendar from 'components/Calander/MarkDates';
+import MarkMonths from 'components/Calander/MarkMonths';
+import MarkWeek from 'components/Calander/MarkWeek';
 
-const steps = ['Personal Information', 'Loan Information', 'Guranter Information', 'Finish Loan Application'];
+const steps = ['Personal Information', 'Loan Information', 'Guranter Information', 'Collection Information', 'Finish Loan Application'];
 
 const CreateLoan = () => {
   const [route, setRoute] = useState([]);
@@ -24,7 +38,10 @@ const CreateLoan = () => {
   const [loanType, setLoanType] = useState([]);
   const [category, setCategory] = useState([]);
 
+  const [collection, setCollection] = useState([]);
+
   const [isOpen, setIsOpen] = useState(false);
+  const [checked, setChecked] = useState(true);
 
   const [count, setCount] = useState(0);
   const [loanAmount, setLoanAmount] = useState(0);
@@ -192,7 +209,7 @@ const CreateLoan = () => {
               disableOption: 'default', // readonly | disabled | default
               type: 'text', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
               xs: 6,
-              isRequired: true,
+              isRequired: false,
               validationType: 'email' // default | custom
             }
           },
@@ -397,11 +414,27 @@ const CreateLoan = () => {
               isFormField: true,
               disableOption: 'default', // readonly | disabled | default
               type: 'text', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 12,
+              xs: 6,
               value: '',
               isRequired: true,
               validationType: 'default' // default | custom
             }
+          },
+          {
+            accessorKey: 'loan_category',
+            header: 'Category',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'select', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            },
+            editSelectOptions: category.map((category) => ({
+              value: category.catid,
+              text: category.cat_name
+            }))
           },
           {
             accessorKey: 'business_type',
@@ -449,22 +482,7 @@ const CreateLoan = () => {
               validationType: 'default' // default | custom
             }
           },
-          {
-            accessorKey: 'loan_category',
-            header: 'Category',
-            formField: {
-              isFormField: true,
-              disableOption: 'default', // readonly | disabled | default
-              type: 'select', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 6,
-              isRequired: true,
-              validationType: 'default' // default | custom
-            },
-            editSelectOptions: category.map((category) => ({
-              value: category.catid,
-              text: category.cat_name
-            }))
-          },
+
           {
             accessorKey: 'loantype_id',
             header: 'Loan Type',
@@ -498,28 +516,30 @@ const CreateLoan = () => {
             }))
           },
           {
-            accessorKey: 'startDate',
-            header: 'Start Date',
+            accessorKey: 'hold_period',
+            header: 'Hold Period',
             formField: {
               isFormField: true,
               disableOption: 'default', // readonly | disabled
-              type: 'date', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              type: 'select', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
               xs: 6,
               isRequired: true,
               validationType: 'default' // default | custom
-            }
-          },
-          {
-            accessorKey: 'endDate',
-            header: 'End Date',
-            formField: {
-              isFormField: true,
-              disableOption: 'default', // readonly | disabled
-              type: 'date', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 6,
-              isRequired: true,
-              validationType: 'default' // default | custom
-            }
+            },
+            editSelectOptions: [
+              {
+                value: '1',
+                text: 'Day'
+              },
+              {
+                value: '2',
+                text: 'Week'
+              },
+              {
+                value: '3',
+                text: 'Month'
+              }
+            ]
           },
           {
             accessorKey: 'document_charge',
@@ -536,18 +556,6 @@ const CreateLoan = () => {
           {
             accessorKey: 'service_charge',
             header: 'Service Charge',
-            formField: {
-              isFormField: true,
-              disableOption: 'default', // readonly | disabled
-              type: 'number', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 6,
-              isRequired: true,
-              validationType: 'default' // default | custom
-            }
-          },
-          {
-            accessorKey: 'hold_period',
-            header: 'Hold Period',
             formField: {
               isFormField: true,
               disableOption: 'default', // readonly | disabled
@@ -592,6 +600,18 @@ const CreateLoan = () => {
               isRequired: true,
               validationType: 'default' // default | custom
             }
+          },
+          {
+            accessorKey: 'total_payamount',
+            header: 'Total Pay Amount',
+            formField: {
+              isFormField: true,
+              disableOption: 'disabled', // readonly | disabled
+              type: 'number', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
           }
         ]
       }
@@ -629,7 +649,10 @@ const CreateLoan = () => {
   const handleSave = async () => {
     setFormData((prevState) => ({
       ...prevState,
-      deposit: depositData.data
+      deposit: {
+        ...prevState.deposit,
+        deposithas: checked
+      }
     }));
 
     try {
@@ -645,7 +668,8 @@ const CreateLoan = () => {
       if (response.status === 200) {
         setisLoading(false);
         fetchData();
-        showToast(response.data.message, reloadPage);
+        showToast(response.data.message);
+        window.location.reload();
       } else if (response.status === 401) {
         logout();
       } else {
@@ -657,7 +681,8 @@ const CreateLoan = () => {
         window.location.reload();
         logout();
       } else {
-        console.log();
+        console.log(error);
+        setisLoading(false);
         showToast(error.response?.data.error || 'An error occurred', 'warn');
       }
     }
@@ -665,22 +690,26 @@ const CreateLoan = () => {
     handleClose();
   };
 
-  const showToast = (message, type = 'success', callback) => {
+  const showToast = (message, type = 'success') => {
     toast[type](message, {
       position: toast.POSITION.BOTTOM_RIGHT,
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
-      progress: undefined,
-      onClose: callback // This will execute the callback when the toast is closed
+      progress: undefined
     });
   };
 
-  // Example of using showToast with a reload callback
-  const reloadPage = () => {
-    window.location.reload();
+  const handleCheck = () => {
+    setChecked(!checked); // Toggle the value of 'checked'
+    // Add other logic if needed
   };
+
+  const handleChange = (event) => {
+    console.log(event);
+  };
+  // Example of using showToast with a reload callback
 
   return (
     <MainCard>
@@ -773,15 +802,51 @@ const CreateLoan = () => {
                 </Box>
               ) : count === 3 ? (
                 <Box sx={{ width: '100%', padding: '50px 0px 0px 0px' }}>
-                  <StepForm
-                    handlePrev={handlePrev}
-                    count={count}
-                    columns={createDepositForm}
-                    formData={depositData}
-                    setFormData={setDepositData}
-                    setformDataCollection={setFormData}
-                    formSubmit={depositInformation_formSubmit}
-                  />
+                  {loanData == 1 ? (
+                    <MarkedDatesCalendar setData={setCollection} data={collection} />
+                  ) : loanData == 2 ? (
+                    <MarkWeek setData={setCollection} data={collection} />
+                  ) : loanData == 3 ? (
+                    <MarkMonths setData={setCollection} data={collection} />
+                  ) : (
+                    <></>
+                  )}
+                  <Box sx={{ width: '100%', display: 'flex', padding: '20px', justifyContent: 'space-between' }}>
+                    <Button disabled={count == 0} variant="contained" onClick={handlePrev}>
+                      Previous
+                    </Button>
+                    <Button type="button" variant="contained">
+                      Next
+                    </Button>
+                  </Box>
+                </Box>
+              ) : count === 4 ? (
+                <Box sx={{ width: '100%', padding: '50px 0px 0px 0px' }}>
+                  <FormGroup style={{ paddingBottom: '20px' }}>
+                    <FormControlLabel control={<Checkbox checked={checked} onChange={handleCheck} />} label="Deposit Account Create" />
+                  </FormGroup>
+                  {checked === true ? (
+                    <StepForm
+                      handlePrev={handlePrev}
+                      count={count}
+                      columns={createDepositForm}
+                      formData={depositData}
+                      setFormData={setDepositData}
+                      setformDataCollection={setFormData}
+                      formSubmit={depositInformation_formSubmit}
+                    />
+                  ) : (
+                    <>
+                      <Box sx={{ width: '100%', display: 'flex', padding: '20px', justifyContent: 'space-between' }}>
+                        <Button disabled={count == 0} variant="contained" onClick={handlePrev}>
+                          Previous
+                        </Button>
+                        <Button type="submit" variant="contained">
+                          Finish
+                        </Button>
+                      </Box>
+                    </>
+                  )}
                 </Box>
               ) : (
                 <></>

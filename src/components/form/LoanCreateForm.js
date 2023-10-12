@@ -123,6 +123,11 @@ function SimpleForm(props) {
     props;
 
   const handleValidation = (validationType, field) => {
+    if (!field) {
+      console.error('Field object is missing.');
+      return;
+    }
+
     if (validationType === 'mobile') {
       const validation = Yup.string()
         .matches(/^[+]\d{1,3}\s?(\d{10}|\d{12})$/, {
@@ -133,7 +138,10 @@ function SimpleForm(props) {
 
       field.validation = validation;
     } else if (validationType === 'email') {
-      const validation = Yup.string().email('Invalid email address').required('This field is required');
+      const baseValidation = Yup.string().email('Invalid email address');
+
+      const validation = field.isrequired ? baseValidation.required('This field is required') : baseValidation;
+
       field.validation = validation;
     } else if (validationType === 'password') {
       field.validation = passwordSchema;
@@ -148,9 +156,14 @@ function SimpleForm(props) {
         .required('This field is required');
 
       field.validation = validation;
-    } else if (field.isrequired === true) {
-      const validation = Yup.string().required('This field is required');
-      field.validation = validation;
+    }
+
+    if (field.isrequired === true) {
+      const baseValidation = Yup.string();
+
+      field.validation = field.validation
+        ? field.validation.concat(baseValidation.required('This field is required'))
+        : baseValidation.required('This field is required');
     }
   };
 
@@ -270,7 +283,7 @@ function SimpleForm(props) {
 
         // Use parseFloat to convert values to floats
         const rate = parseFloat(formData.data.rate) || 0;
-        const calc = (parseFloat(formData.data.loan_amount) * rate) / 100;
+        const calc = (parseFloat(formData.data.loan_amount) / 100) * rate;
 
         const total_payable = parseFloat(formData.data.loan_amount) + calc;
 
@@ -298,7 +311,7 @@ function SimpleForm(props) {
 
         // Use parseFloat to convert values to floats
         const rate = parseFloat(value) || 0;
-        const calc = (parseFloat(formData.data.loan_amount) * rate) / 100;
+        const calc = (parseFloat(formData.data.loan_amount) / 100) * rate;
         const total_payable = parseFloat(formData.data.loan_amount) + calc;
 
         // Check if getslected.label is not zero to avoid division by zero
@@ -325,7 +338,7 @@ function SimpleForm(props) {
 
         // Use parseFloat to convert values to floats
         const rate = parseFloat(formData.data.rate) || 0;
-        const calc = (parseFloat(value) * rate) / 100;
+        const calc = (parseFloat(value) / 100) * rate;
         const total_payable = parseFloat(value) + calc;
 
         // Check if getslected.label is not zero to avoid division by zero
@@ -504,7 +517,7 @@ function SimpleForm(props) {
       <form onSubmit={handleFormSubmit} encType="multipart/form-data">
         <Grid container spacing={2}>
           {formFields.map((field) => (
-            <Grid item xs={field.xs} sm={field.sm} key={field.name}>
+            <Grid item xs={12} sm={12} lg={field.xs} key={field.name}>
               {field.type === 'file' && (
                 <FormControl style={{ width: '100%', marginBottom: '15px' }}>
                   <div
