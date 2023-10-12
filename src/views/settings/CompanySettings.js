@@ -161,6 +161,9 @@ const UserPermissionSettingsMainPage = () => {
         formHeading: 'Branch Create Form',
         headingVariant: 'h3',
         buttonText: 'Save',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'shopname',

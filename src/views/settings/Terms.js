@@ -59,6 +59,9 @@ const TermsSettingsMainPage = () => {
         formName: 'termsadd',
         formHeading: 'Terms Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'no_of_terms',

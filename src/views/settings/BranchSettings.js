@@ -87,6 +87,9 @@ const UserPermissionSettingsMainPage = () => {
         formName: 'branchadd',
         formHeading: 'Branch Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'branch_name',

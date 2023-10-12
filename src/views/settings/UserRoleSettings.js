@@ -247,6 +247,9 @@ const UserRoleSettingsMainPage = () => {
         formHeading: 'User Role and Permission',
         formType: 'simple', // dynamic | simple
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'role',

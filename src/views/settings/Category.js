@@ -80,6 +80,9 @@ const CategorySettingsMainPage = () => {
         formName: 'categoryadd',
         formHeading: 'Category Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'cat_name',

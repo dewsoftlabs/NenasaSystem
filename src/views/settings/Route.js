@@ -80,6 +80,9 @@ const CategorySettingsMainPage = () => {
         formName: 'routeadd',
         formHeading: 'Route Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'route_name',

@@ -195,6 +195,9 @@ const UserSettingsMainPage = () => {
         formName: 'customeradd',
         formHeading: 'Customer Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'customer_name',

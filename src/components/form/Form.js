@@ -779,14 +779,28 @@ function SimpleForm(props) {
             </Grid>
           ))}
         </Grid>
-        <Button
-          variant="contained"
-          color="primary"
-          type="submit"
-          style={{ width: '100%', background: '#1790FF', color: 'white', height: '50px', borderRadius: '15px', marginBottom: 10 }}
-        >
-          {columns[0].buttonText ? columns[0].buttonText : 'Submit'}
-        </Button>
+
+        <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            style={
+              columns[0].buttonConfig.styles
+                ? columns[0].buttonConfig.styles
+                : {
+                    width: '100%',
+                    background: '#1790FF',
+                    color: 'white',
+                    height: '50px',
+                    borderRadius: '15px',
+                    marginBottom: 10
+                  }
+            }
+          >
+            {columns[0].buttonText ? columns[0].buttonText : 'Submit'}
+          </Button>
+        </div>
       </form>
     </div>
   );
