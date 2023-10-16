@@ -11,8 +11,7 @@ const MenuList = () => {
   const navItems = menuItem.items.map((item) => {
     console.log(item.children.some((child) => child.permissionCode));
     if (
-      item.children.some((child) => child.permissionCode == '') ||
-      hasPermission(item.children.map((child) => child.permissionCode)[0]) ||
+      item.children.some((child) => child.permissionCode == '' || hasPermission(child.permissionCode)) ||
       getUserRoleID() == 1 ||
       getUserRoleID() == 2
     ) {

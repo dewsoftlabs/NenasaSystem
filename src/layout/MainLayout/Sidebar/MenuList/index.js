@@ -11,8 +11,7 @@ import { hasPermission, getUserRoleID } from '../../../../session';
 const MenuList = () => {
   const navItems = menuItem.items.map((item) => {
     if (
-      item.children.some((child) => child.permissionCode) ||
-      hasPermission(item.children.map((child) => child.permissionCode)) ||
+      item.children.some((child) => child.permissionCode == '' || hasPermission(child.permissionCode)) ||
       getUserRoleID() == 1 ||
       getUserRoleID() == 2
     ) {

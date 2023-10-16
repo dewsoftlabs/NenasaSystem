@@ -16,6 +16,8 @@ import { drawerWidth } from 'store/constant';
 import { SET_MENU } from 'store/customization/actions';
 import { useNavigate } from 'react-router-dom';
 
+import { setUserDetails } from '../../store/user/userAction';
+
 import { isAuthenticated, getUserid, getUserRoleID, logout, setPermissionCodes, getToken } from '../../session';
 // assets
 import { IconChevronRight } from '@tabler/icons';
@@ -95,16 +97,38 @@ const MainLayout = () => {
     }
   }, []);
 
+  const fetchUser = useCallback(async () => {
+    try {
+      const currentUserID = getUserid(); // Assuming you have a function to get the user ID
+
+      const response = await Axios.get(process.env.REACT_APP_API_ENDPOINT + '/user/me/' + currentUserID, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': getToken()
+        }
+      });
+
+      if (response.status === 200) {
+        dispatch(setUserDetails(response.data[0]));
+      } else {
+        fetchUser();
+      }
+    } catch (error) {
+      logout();
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     if (!isAuthenticated()) {
-      console.log('here');
       navigate('/login');
     }
+
+    fetchUser();
 
     if (getUserRoleID() != 1 && getUserRoleID() != 2) {
       fetchUserPermission();
     }
-  }, [fetchUserPermission, navigate]);
+  }, [fetchUserPermission, fetchUser, navigate]);
 
   return (
     <Box sx={{ display: 'flex' }}>

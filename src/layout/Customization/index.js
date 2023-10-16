@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
-// material-ui
 import { useTheme } from '@mui/material/styles';
 import {
   Drawer,
@@ -13,40 +11,41 @@ import {
   Radio,
   RadioGroup,
   Slider,
+  Switch,
   Tooltip,
   Typography
 } from '@mui/material';
 import { IconSettings } from '@tabler/icons';
-
-// third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
-// project imports
 import SubCard from 'ui-component/cards/SubCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
-import { SET_BORDER_RADIUS, SET_FONT_FAMILY } from 'store/customization/actions';
+import { SET_BORDER_RADIUS, SET_FONT_FAMILY, TOGGLE_DARK_MODE } from 'store/customization/actions';
 import { gridSpacing } from 'store/constant';
 
-// concat 'px'
 function valueText(value) {
   return `${value}px`;
 }
-
-// ==============================|| LIVE CUSTOMIZATION ||============================== //
 
 const Customization = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const customization = useSelector((state) => state.customization);
 
-  // drawer on/off
+  const [darkMode, setDarkMode] = useState(customization.darkMode);
+
+  const toggleDarkMode = () => {
+    dispatch({ type: TOGGLE_DARK_MODE });
+    setDarkMode(!darkMode);
+  };
+
   const [open, setOpen] = useState(false);
+
   const handleToggle = () => {
     setOpen(!open);
   };
 
-  // state - border radius
   const [borderRadius, setBorderRadius] = useState(customization.borderRadius);
+
   const handleBorderRadius = (event, newValue) => {
     setBorderRadius(newValue);
   };
@@ -55,42 +54,26 @@ const Customization = () => {
     dispatch({ type: SET_BORDER_RADIUS, borderRadius });
   }, [dispatch, borderRadius]);
 
-  let initialFont;
-  switch (customization.fontFamily) {
-    case `'Inter', sans-serif`:
-      initialFont = 'Inter';
-      break;
-    case `'Poppins', sans-serif`:
-      initialFont = 'Poppins';
-      break;
-    case `'Roboto', sans-serif`:
-    default:
-      initialFont = 'Roboto';
-      break;
-  }
+  const fontOptions = ['Roboto', 'Poppins', 'Inter'];
 
-  // state - font family
+  const initialFont = fontOptions.find((font) => customization.fontFamily.includes(font)) || 'Roboto';
+
   const [fontFamily, setFontFamily] = useState(initialFont);
+
   useEffect(() => {
-    let newFont;
-    switch (fontFamily) {
-      case 'Inter':
-        newFont = `'Inter', sans-serif`;
-        break;
-      case 'Poppins':
-        newFont = `'Poppins', sans-serif`;
-        break;
-      case 'Roboto':
-      default:
-        newFont = `'Roboto', sans-serif`;
-        break;
-    }
+    const newFont = `'${fontFamily}', sans-serif`;
     dispatch({ type: SET_FONT_FAMILY, fontFamily: newFont });
   }, [dispatch, fontFamily]);
 
+  useEffect(() => {
+    if (darkMode) {
+      // Apply your logic to activate dark theme here
+      // This could include updating styles or dispatching actions
+    }
+  }, [darkMode]);
+
   return (
     <>
-      {/* toggle button */}
       <Tooltip title="Live Customize">
         <Fab
           component="div"
@@ -131,8 +114,19 @@ const Customization = () => {
         <PerfectScrollbar component="div">
           <Grid container spacing={gridSpacing} sx={{ p: 3 }}>
             <Grid item xs={12}>
-              {/* font family */}
-              <SubCard title="Font Family">
+              <SubCard title="Theme Mode">
+                <FormControlLabel
+                  control={<Switch checked={darkMode} onChange={toggleDarkMode} />}
+                  label={darkMode ? 'Dark Mode' : 'Light Mode'}
+                  sx={{
+                    '& .MuiSvgIcon-root': { fontSize: 28 },
+                    '& .MuiFormControlLabel-label': { color: theme.palette.grey[900] }
+                  }}
+                />
+              </SubCard>
+            </Grid>
+            <Grid item xs={12}>
+              <SubCard title="Fonts">
                 <FormControl>
                   <RadioGroup
                     aria-label="font-family"
@@ -140,39 +134,23 @@ const Customization = () => {
                     onChange={(e) => setFontFamily(e.target.value)}
                     name="row-radio-buttons-group"
                   >
-                    <FormControlLabel
-                      value="Roboto"
-                      control={<Radio />}
-                      label="Roboto"
-                      sx={{
-                        '& .MuiSvgIcon-root': { fontSize: 28 },
-                        '& .MuiFormControlLabel-label': { color: theme.palette.grey[900] }
-                      }}
-                    />
-                    <FormControlLabel
-                      value="Poppins"
-                      control={<Radio />}
-                      label="Poppins"
-                      sx={{
-                        '& .MuiSvgIcon-root': { fontSize: 28 },
-                        '& .MuiFormControlLabel-label': { color: theme.palette.grey[900] }
-                      }}
-                    />
-                    <FormControlLabel
-                      value="Inter"
-                      control={<Radio />}
-                      label="Inter"
-                      sx={{
-                        '& .MuiSvgIcon-root': { fontSize: 28 },
-                        '& .MuiFormControlLabel-label': { color: theme.palette.grey[900] }
-                      }}
-                    />
+                    {fontOptions.map((font) => (
+                      <FormControlLabel
+                        key={font}
+                        value={font}
+                        control={<Radio />}
+                        label={font}
+                        sx={{
+                          '& .MuiSvgIcon-root': { fontSize: 28 },
+                          '& .MuiFormControlLabel-label': { color: theme.palette.grey[900] }
+                        }}
+                      />
+                    ))}
                   </RadioGroup>
                 </FormControl>
               </SubCard>
             </Grid>
             <Grid item xs={12}>
-              {/* border radius */}
               <SubCard title="Border Radius">
                 <Grid item xs={12} container spacing={2} alignItems="center" sx={{ mt: 2.5 }}>
                   <Grid item>

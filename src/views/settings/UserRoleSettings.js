@@ -331,7 +331,7 @@ const UserRoleSettingsMainPage = () => {
 
   const table = {
     table: 'userrole',
-    tableType: 'advance',
+    tableType: 'advance', //simple | advance
     heading: 'User Role and Permission Table',
     enableHeading: false,
     enableCopy: false,
@@ -341,7 +341,7 @@ const UserRoleSettingsMainPage = () => {
     enableCSVExport: true,
     enablepdf: true,
     row: {
-      rowSelect: false,
+      rowSelect: true,
       rowRedirect: '/loan/loan-detail/'
     },
     group: {
@@ -379,7 +379,8 @@ const UserRoleSettingsMainPage = () => {
     },
 
     delete: {
-      deleteType: 'single', //single | multiple | mix
+      permissionCode: '',
+      deleteType: 'mix', //single | multiple | mix
       deleteApi: '', //multiple delete
       deleteText: 'Delete Permission', //use default keep empty
       singleDeleteApi: '/permission_group/delete/'

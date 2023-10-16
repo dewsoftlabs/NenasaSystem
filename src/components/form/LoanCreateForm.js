@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { TextareaAutosize } from '@mui/base';
-
+import { useTheme } from '@mui/material/styles';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -54,6 +54,7 @@ const imageSchema = Yup.mixed().test('image', 'Invalid image format', (value) =>
 });
 
 function SimpleForm(props) {
+  const theme = useTheme();
   const [focusedField, setFocusedField] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [checkgroup, setCheckGroup] = useState([]);
@@ -123,6 +124,11 @@ function SimpleForm(props) {
     props;
 
   const handleValidation = (validationType, field) => {
+    if (!field) {
+      console.error('Field object is missing.');
+      return;
+    }
+
     if (validationType === 'mobile') {
       const validation = Yup.string()
         .matches(/^[+]\d{1,3}\s?(\d{10}|\d{12})$/, {
@@ -133,7 +139,10 @@ function SimpleForm(props) {
 
       field.validation = validation;
     } else if (validationType === 'email') {
-      const validation = Yup.string().email('Invalid email address').required('This field is required');
+      const baseValidation = Yup.string().email('Invalid email address');
+
+      const validation = field.isrequired ? baseValidation.required('This field is required') : baseValidation;
+
       field.validation = validation;
     } else if (validationType === 'password') {
       field.validation = passwordSchema;
@@ -148,9 +157,14 @@ function SimpleForm(props) {
         .required('This field is required');
 
       field.validation = validation;
-    } else if (field.isrequired === true) {
-      const validation = Yup.string().required('This field is required');
-      field.validation = validation;
+    }
+
+    if (field.isrequired === true) {
+      const baseValidation = Yup.string();
+
+      field.validation = field.validation
+        ? field.validation.concat(baseValidation.required('This field is required'))
+        : baseValidation.required('This field is required');
     }
   };
 
@@ -200,7 +214,7 @@ function SimpleForm(props) {
     }
 
     if (name === 'document_charge' || name === 'service_charge' || name === 'deposit_amount') {
-      // calculateTotalPayable(event);
+      calculateTotalPayable(event);
     }
   };
 
@@ -216,11 +230,11 @@ function SimpleForm(props) {
         setFormData((prevState) => ({
           data: {
             ...prevState.data,
-            total_payable: total_payable
+            total_payamount: total_payable
           },
           errors: {
             ...prevState.errors,
-            total_payable: fieldError
+            total_payamount: fieldError
           }
         }));
       }
@@ -232,11 +246,11 @@ function SimpleForm(props) {
         setFormData((prevState) => ({
           data: {
             ...prevState.data,
-            total_payable: total_payable
+            total_payamount: total_payable
           },
           errors: {
             ...prevState.errors,
-            total_payable: fieldError
+            total_payamount: fieldError
           }
         }));
       }
@@ -247,11 +261,11 @@ function SimpleForm(props) {
         setFormData((prevState) => ({
           data: {
             ...prevState.data,
-            total_payable: total_payable
+            total_payamount: total_payable
           },
           errors: {
             ...prevState.errors,
-            total_payable: fieldError
+            total_payamount: fieldError
           }
         }));
       }
@@ -270,7 +284,7 @@ function SimpleForm(props) {
 
         // Use parseFloat to convert values to floats
         const rate = parseFloat(formData.data.rate) || 0;
-        const calc = (parseFloat(formData.data.loan_amount) * rate) / 100;
+        const calc = (parseFloat(formData.data.loan_amount) / 100) * rate;
 
         const total_payable = parseFloat(formData.data.loan_amount) + calc;
 
@@ -298,7 +312,7 @@ function SimpleForm(props) {
 
         // Use parseFloat to convert values to floats
         const rate = parseFloat(value) || 0;
-        const calc = (parseFloat(formData.data.loan_amount) * rate) / 100;
+        const calc = (parseFloat(formData.data.loan_amount) / 100) * rate;
         const total_payable = parseFloat(formData.data.loan_amount) + calc;
 
         // Check if getslected.label is not zero to avoid division by zero
@@ -325,7 +339,7 @@ function SimpleForm(props) {
 
         // Use parseFloat to convert values to floats
         const rate = parseFloat(formData.data.rate) || 0;
-        const calc = (parseFloat(value) * rate) / 100;
+        const calc = (parseFloat(value) / 100) * rate;
         const total_payable = parseFloat(value) + calc;
 
         // Check if getslected.label is not zero to avoid division by zero
@@ -378,7 +392,6 @@ function SimpleForm(props) {
         }
       }));
 
-      console.log(checkgroup);
       return updatedCheckGroup;
     });
   };
@@ -422,8 +435,6 @@ function SimpleForm(props) {
     const hasErrors = Object.values(formData.errors).some((error) => error !== null);
 
     if (!hasErrors) {
-      console.log(formData);
-
       setformDataCollection((prevState) => ({
         ...prevState,
         [columns[0].formName]: formData.data
@@ -499,497 +510,480 @@ function SimpleForm(props) {
     }));
   };
 
+  const renderSelectField = (field) => (
+    <FormControl style={{ width: '100%', marginBottom: theme.spacing(2) }}>
+      <InputLabel
+        style={{
+          borderRadius: `${theme.shape.borderRadius} !important`,
+          marginLeft: `${theme.spacing(1)} !important`,
+          marginRight: `${theme.spacing(1)} !important`,
+          borderColor: theme.palette.text.primary,
+          backgroundColor: theme.palette.background['paper'],
+          color: theme.palette.text.primary
+        }}
+      >
+        {field.label}
+      </InputLabel>
+      <Select
+        className="select-modal"
+        name={field.name}
+        value={formData.data[field.name] || ''}
+        onChange={handleChange}
+        required={field.isrequired}
+        disabled={field.disableOption === 'disabled' && true}
+        readOnly={field.disableOption === 'readonly' && true}
+        onFocus={() => handleFieldFocus(field.name)}
+        onBlur={() => setFocusedField(null)}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: theme.palette.text.primary
+            },
+            '&:hover fieldset': {
+              borderColor: theme.palette.text.primary
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette.text.primary
+            }
+          },
+          '& .MuiOutlinedInput-input': {
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.background['paper']
+          },
+          '& fieldset': {
+            borderColor: theme.palette.text.primary
+          },
+          '&:hover fieldset': {
+            borderColor: theme.palette.text.primary
+          },
+          '& fieldset .Mui-focused': {
+            borderColor: theme.palette.text.primary
+          }
+        }}
+      >
+        {field.options.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+
+  const renderTextareaField = (field) => (
+    <FormControl style={{ width: '100%', marginBottom: theme.spacing(2) }}>
+      <TextareaAutosize
+        minRows={3}
+        maxRows={10}
+        aria-label={field.label}
+        placeholder={field.label}
+        name={field.name}
+        required={field.isrequired}
+        readOnly={true}
+        value={formData.data[field.name] ? formData.data[field.name] : ''}
+        onChange={handleChange}
+        error={!!formData.errors[field.name]}
+        helperText={formData.errors[field.name]}
+        fullWidth
+        style={{
+          color: theme.palette.text.primary,
+          backgroundColor: theme.palette.background['paper'],
+          borderColor: formData.errors[field.name] ? theme.palette.error.main : theme.palette.text.primary
+        }}
+        onFocus={() => handleFieldFocus(field.name)}
+        onBlur={() => setFocusedField(null)}
+      />
+    </FormControl>
+  );
+
+  const renderTextField = (field) => (
+    <FormControl style={{ width: '100%', marginBottom: theme.spacing(2) }}>
+      <TextField
+        label={field.label}
+        style={{ backgroundColor: theme.palette.background['paper'] }}
+        name={field.name}
+        type={field.type}
+        required={field.isrequired}
+        disabled={field.disableOption === 'disabled' && true}
+        readOnly={true}
+        value={formData.data[field.name] ? formData.data[field.name] : field.value}
+        onChange={handleChange}
+        error={!!formData.errors[field.name]}
+        helperText={formData.errors[field.name]}
+        fullWidth
+        onFocus={() => handleFieldFocus(field.name)}
+        onBlur={() => setFocusedField(null)}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: formData.errors[field.name] ? theme.palette.error.main : theme.palette.text.primary
+            },
+            '&:hover fieldset': {
+              borderColor: theme.palette.primary.main
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette.primary.main
+            }
+          },
+          '& .MuiOutlinedInput-input': {
+            color: theme.palette.text['primary'],
+            backgroundColor: theme.palette.background['paper']
+          }
+        }}
+      />
+    </FormControl>
+  );
+
+  const renderSearch = (field) => (
+    <FormControl style={{ width: '100%', marginBottom: '15px' }}>
+      <Autocomplete
+        options={field.options || []} // Ensure that options is defined or provide a default value
+        getOptionLabel={(option) => option.label}
+        value={formData.data[field.name]}
+        onChange={(e) => {
+          if (field.action) {
+            field.action(e);
+          }
+          handleChange(e); // Make sure to call handleChange if needed
+        }}
+        disableClearable
+        renderInput={(params) => (
+          <TextField {...params} label={field.label} onFocus={() => handleFieldFocus(field.name)} onBlur={() => setFocusedField(null)} />
+        )}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: theme.palette.background['paper'],
+            borderColor: theme.palette.primary['main'],
+
+            '& fieldset': {
+              borderColor: theme.palette.primary.main
+            },
+            '&:hover fieldset': {
+              borderColor: theme.palette.primary.main
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette.primary.main
+            }
+          },
+          '& .MuiOutlinedInput-input': {
+            color: theme.palette.text['primary'],
+            backgroundColor: theme.palette.background['paper']
+          }
+        }}
+      />
+    </FormControl>
+  );
+
+  const renderCheckGroup = (field) => {
+    return (
+      <FormControl
+        sx={{
+          '&': {
+            width: '100%',
+            borderColor: focusedField === field.name ? theme.palette.text.dark : theme.palette.text.primary,
+            padding: '15px',
+            marginBottom: '15px',
+            border: '1px solid',
+            borderRadius: '10px'
+          }
+        }}
+      >
+        <Typography>{field.label}</Typography>
+        <div style={{ display: 'flex', flexDirection: field.options.length > 2 ? 'column' : 'row', width: '100%', paddingTop: '20px' }}>
+          <div>
+            {field.options.length === 0 ? (
+              <p>
+                <i>No {field.label} available</i>
+              </p>
+            ) : (
+              field.options.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  onFocus={() => handleFieldFocus(field.name)}
+                  control={
+                    <Checkbox
+                      name={field.name}
+                      value={option.label}
+                      onChange={(e) => {
+                        handleChangeCheckList(e);
+                      }}
+                      color="primary"
+                      disabled={field.disableOption === 'disabled' && true}
+                      readOnly={field.disableOption === 'readonly' && true}
+                    />
+                  }
+                  label={option.label}
+                  style={{
+                    marginBottom: field.options.length > 2 ? '8px' : '0',
+                    marginRight: field.options.length > 2 ? '0' : '8px',
+                    width: field.options.length > 2 ? '50%' : '100%'
+                  }}
+                />
+              ))
+            )}
+          </div>
+        </div>
+
+        {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
+      </FormControl>
+    );
+  };
+  const renderListInputs = (field) => {
+    return (
+      <FormControl
+        sx={{
+          '&': {
+            width: '100%',
+            borderColor: focusedField === field.name ? theme.palette.text.dark : theme.palette.text.primary,
+            padding: '15px',
+            marginBottom: '15px',
+            border: '1px solid',
+            borderRadius: '10px'
+          }
+        }}
+      >
+        <InputLabel>{field.label}</InputLabel>
+        <div style={{ marginTop: '40px', padding: '10px' }}>
+          {textFields.map((subfield, index) => (
+            <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+              <FormControl style={{ width: '90%', marginBottom: '15px' }}>
+                <TextField
+                  label={subfield.label}
+                  name={subfield.name}
+                  type={(field.type === 'textlist' && 'text') || (field.type === 'numberlist' && 'number')}
+                  required={subfield.isrequired}
+                  disabled={subfield.disableOption === 'disabled' && true}
+                  readOnly={true}
+                  onChange={(event) => handleChangeDynamicText(event, index, field.name)}
+                  error={!!formData.errors[subfield.name]}
+                  helperText={formData.errors[subfield.name]}
+                  fullWidth
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: theme.palette.background['paper'],
+                      borderColor: theme.palette.primary['main'],
+
+                      '& fieldset': {
+                        borderColor: theme.palette.primary.main
+                      },
+                      '&:hover fieldset': {
+                        borderColor: theme.palette.primary.main
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: theme.palette.primary.main
+                      }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: theme.palette.text['primary'],
+                      backgroundColor: theme.palette.background['paper']
+                    }
+                  }}
+                />
+              </FormControl>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => handleDeleteTextBox(index)}
+                type="button"
+                style={{
+                  width: '10%',
+                  height: '50px',
+                  background: 'transparent',
+                  color: theme.palette.common.white,
+                  outline: '0px',
+                  marginLeft: '10px',
+                  boxShadow: 'none'
+                }}
+              >
+                <IconTrash />
+              </Button>
+            </div>
+          ))}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddTextBox}
+            type="button"
+            style={{ width: '10%', background: '#1790FF', color: 'white', height: '35px', marginBottom: '20px' }}
+          >
+            <IconPlus />
+          </Button>
+          {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
+        </div>
+      </FormControl>
+    );
+  };
+
+  const renderDate = (field) => (
+    <FormControl style={{ width: '100%', marginBottom: '15px' }}>
+      <InputLabel>{field.label}</InputLabel>
+      <div style={{ width: '100%', marginTop: '38px', padding: '0px 20px 20px 20px' }}>
+        <FormControlLabel
+          style={{ width: '100%' }}
+          sx={{
+            '& .MuiFormControl-root': {
+              width: '100%'
+            }
+          }}
+          control={
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              {field.type === 'date' ? (
+                <DatePicker
+                  color="primary"
+                  value={
+                    formData.data[field.name]
+                      ? dayjs(formData.data[field.name]).isValid()
+                        ? dayjs(formData.data[field.name])
+                        : null
+                      : null
+                  }
+                  onChange={(e) => {
+                    handleDateChange(field.name, e, field.type);
+                  }}
+                  onFocus={() => handleFieldFocus(field.name)}
+                  onBlur={() => setFocusedField(null)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: formData.errors[field.name] ? theme.palette.error.main : theme.palette.text.primary
+                      },
+                      '&:hover fieldset': {
+                        borderColor: theme.palette.primary.main
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: theme.palette.primary.main
+                      }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: theme.palette.text['primary'],
+                      backgroundColor: theme.palette.background['paper']
+                    }
+                  }}
+                />
+              ) : field.type === 'time' ? (
+                <TimePicker
+                  color="primary"
+                  value={
+                    formData.data[field.name]
+                      ? dayjs(formData.data[field.name]).isValid()
+                        ? dayjs(formData.data[field.name])
+                        : null
+                      : null
+                  }
+                  onChange={(e) => {
+                    handleDateChange(field.name, e, field.type);
+                  }}
+                  onFocus={() => handleFieldFocus(field.name)}
+                  onBlur={() => setFocusedField(null)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: formData.errors[field.name] ? theme.palette.error.main : theme.palette.text.primary
+                      },
+                      '&:hover fieldset': {
+                        borderColor: theme.palette.primary.main
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: theme.palette.primary.main
+                      }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: theme.palette.text['primary'],
+                      backgroundColor: theme.palette.background['paper']
+                    }
+                  }}
+                />
+              ) : field.type === 'datetime' ? (
+                <DateTimePicker
+                  color="primary"
+                  value={
+                    formData.data[field.name]
+                      ? dayjs(formData.data[field.name]).isValid()
+                        ? dayjs(formData.data[field.name])
+                        : null
+                      : null
+                  }
+                  onChange={(e) => {
+                    handleDateChange(field.name, e, field.type);
+                  }}
+                  onFocus={() => handleFieldFocus(field.name)}
+                  onBlur={() => setFocusedField(null)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: formData.errors[field.name] ? theme.palette.error.main : theme.palette.text.primary
+                      },
+                      '&:hover fieldset': {
+                        borderColor: theme.palette.primary.main
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: theme.palette.primary.main
+                      }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: theme.palette.text['primary'],
+                      backgroundColor: theme.palette.background['paper']
+                    }
+                  }}
+                />
+              ) : (
+                <></>
+              )}
+            </LocalizationProvider>
+          }
+        />
+      </div>
+      {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
+    </FormControl>
+  );
+
   return (
     <div>
       <form onSubmit={handleFormSubmit} encType="multipart/form-data">
         <Grid container spacing={2}>
           {formFields.map((field) => (
-            <Grid item xs={field.xs} sm={field.sm} key={field.name}>
-              {field.type === 'file' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <div
-                    style={{
-                      border: '1px solid #fff',
-                      borderRadius: '4px',
-                      paddingTop: '7.5px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'right',
-                      height: 'auto'
-                    }}
-                  >
-                    <InputLabel
-                      style={{
-                        backgroundColor: '#fff',
-                        borderRadius: '5px',
-                        margin: '0 ',
-                        color: focusedField === field.name ? '#000' : '#000'
-                      }}
-                    >
-                      {field.label}
-                    </InputLabel>
-                    <input
-                      name={field.name}
-                      type="file"
-                      accept="image/pdf"
-                      onChange={(e) => {
-                        setSelectedImage(e.target.files[0]);
-                        handleChange(e); // Call the handleChange function separately
-                      }}
-                      style={{ display: 'none' }}
-                      id={`${field.name}-upload-input`}
-                    />
-
-                    <label htmlFor={`${field.name}-upload-input`} style={{ textAlign: 'right', marginRight: '15px' }}>
-                      <Button variant="outlined" color="secondary" component="span" style={{ color: '#fff', backgroundColor: '#1890ff' }}>
-                        Upload Image
-                      </Button>
-                    </label>
-
-                    <div
-                      className="selectedImage-div"
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        textAlign: 'right',
-                        marginTop: '8px',
-                        marginRight: '15px'
-                      }}
-                    >
-                      {selectedImage && (
-                        <Typography
-                          variant="body2"
-                          style={{ color: '#1890ff', display: 'flex', flexDirection: 'column', marginBottom: '8px' }}
-                        >
-                          {selectedImage.name}
-                        </Typography>
-                      )}
-                      {formData.errors[field.name] && (
-                        <Typography variant="body2" style={{ color: 'red', marginTop: '8px' }}>
-                          {formData.errors[field.name]}
-                        </Typography>
-                      )}
-                    </div>
-                  </div>
-                </FormControl>
-              )}
-              {field.type === 'select' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <InputLabel
-                    style={{
-                      backgroundColor: '#fff',
-                      borderRadius: '5px !important',
-                      marginLeft: '8px !important',
-                      marginRight: '8px !important',
-                      color: focusedField === field.name ? '#000' : '#000'
-                    }}
-                  >
-                    {field.label}
-                  </InputLabel>
-                  <Select
-                    className="select-modal"
-                    style={{
-                      textAlign: 'left',
-                      color: '#000' // Change the text color
-                    }}
-                    onChange={(e) => {
-                      if (field.action) {
-                        field.action(e);
-                      }
-                      handleChange(e); // Make sure to call handleChange if needed
-                    }}
-                    name={field.name}
-                    value={formData.data[field.name] || ''}
-                    required={field.isrequired}
-                    disabled={field.disableOption === 'disabled' && true}
-                    readOnly={field.disableOption === 'readonly' && true}
-                    onFocus={() => handleFieldFocus(field.name)}
-                    onBlur={() => setFocusedField(null)}
-                  >
-                    {field.options.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-
-              {field.type === 'textarea' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <TextareaAutosize
-                    minRows={3} // You can adjust the number of rows as needed
-                    maxRows={10} // You can adjust the maximum number of rows as needed
-                    aria-label={field.label}
-                    placeholder={field.label}
-                    name={field.name}
-                    required={field.isrequired}
-                    disabled={field.disableOption === 'disabled' && true}
-                    readOnly={true}
-                    value={formData.data[field.name] ? formData.data[field.name] : field.value}
-                    onChange={handleChange}
-                    error={!!formData.errors[field.name]}
-                    helperText={formData.errors[field.name]}
-                    fullWidth
-                    style={{
-                      color: '#000',
-                      borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                    }}
-                    onFocus={() => handleFieldFocus(field.name)}
-                    onBlur={() => setFocusedField(null)}
-                  />
-                </FormControl>
-              )}
-
-              {(field.type === 'text' || field.type === 'email' || field.type === 'number' || field.type === 'password') && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <TextField
-                    label={field.label}
-                    name={field.name}
-                    type={field.type}
-                    required={field.isrequired}
-                    disabled={field.disableOption === 'disabled' && true}
-                    readOnly={true}
-                    value={formData.data[field.name] ? formData.data[field.name] : field.value}
-                    onChange={(e) => {
-                      handleChange(e); // Call the common handleChange function
-                    }}
-                    onInput={(e) => {
-                      if (field.action) {
-                        field.action(e);
-                      }
-                    }}
-                    error={!!formData.errors[field.name]}
-                    helperText={formData.errors[field.name]}
-                    fullWidth
-                    InputLabelProps={{
-                      style: {
-                        color: focusedField === field.name ? '#000' : '#000'
-                      }
-                    }}
-                    InputProps={{
-                      style: {
-                        color: '#000',
-                        borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                      }
-                    }}
-                    onFocus={() => handleFieldFocus(field.name)}
-                    onBlur={() => setFocusedField(null)}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                        },
-                        '&:hover fieldset': {
-                          borderColor: '#1890ff'
-                        },
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#1890ff'
-                        }
-                      },
-                      '& .MuiOutlinedInput-input': {
-                        color: '#1890ff' // Change the text color
-                      }
-                    }}
-                  />
-                </FormControl>
-              )}
-
-              {(field.type === 'textlist' || field.type === 'numberlist') && (
-                <FormControl style={{ width: '100%', marginBottom: '15px', border: '1px solid black', borderRadius: '10px' }}>
-                  <InputLabel style={{ color: focusedField === field.name ? '#000' : '#000' }}>{field.label}</InputLabel>
-                  <div style={{ marginTop: '40px', padding: '10px' }}>
-                    {textFields.map((subfield, index) => (
-                      <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                        <FormControl style={{ width: '90%', marginBottom: '15px' }}>
-                          <TextField
-                            label={subfield.label}
-                            name={subfield.name}
-                            type={(field.type === 'textlist' && 'text') || (field.type === 'numberlist' && 'number')}
-                            required={subfield.isrequired}
-                            disabled={subfield.disableOption === 'disabled' && true}
-                            readOnly={true}
-                            onChange={(event) => handleChangeDynamicText(event, index, field.name)}
-                            error={!!formData.errors[subfield.name]}
-                            helperText={formData.errors[subfield.name]}
-                            fullWidth
-                          />
-                        </FormControl>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => handleDeleteTextBox(index)}
-                          type="button"
-                          style={{
-                            width: '10%',
-                            height: '50px',
-                            background: 'transparent',
-                            color: 'black',
-                            outline: '0px',
-                            marginLeft: '10px',
-                            boxShadow: 'none'
-                          }}
-                        >
-                          <IconTrash />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleAddTextBox}
-                      type="button"
-                      style={{ width: '10%', background: '#1790FF', color: 'white', height: '35px', marginBottom: '20px' }}
-                    >
-                      <IconPlus />
-                    </Button>
-                    {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
-                  </div>
-                </FormControl>
-              )}
-
-              {field.type === 'checkgroup' && (
-                <FormControl
-                  style={{
-                    width: '100%',
-                    padding: '15px',
-                    marginBottom: '15px',
-                    border: '1px solid black',
-                    borderRadius: '10px'
-                  }}
-                >
-                  <Typography>{field.label}</Typography>
-                  <div style={{ marginTop: '10px' }}>
-                    {field.options.length === 0 ? (
-                      <p>
-                        <i>No {field.label} available</i>
-                      </p>
-                    ) : (
-                      field.options.map((option) => (
-                        <FormControlLabel
-                          key={option.value}
-                          control={
-                            <Checkbox
-                              name={field.name}
-                              value={option.label}
-                              onChange={(e) => {
-                                handleChangeCheckList(e);
-                              }}
-                              color="primary"
-                              disabled={field.disableOption === 'disabled' && true}
-                              readOnly={field.disableOption === 'readonly' && true}
-                            />
-                          }
-                          label={option.label}
-                        />
-                      ))
-                    )}
-                  </div>
-                  {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
-                </FormControl>
-              )}
-
-              {field.type === 'date' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <InputLabel style={{ color: focusedField === field.name ? '#000' : '#000' }}>{field.label}</InputLabel>
-                  <div style={{ marginTop: '50px', padding: '0px 20px 20px 20px' }}>
-                    <FormControlLabel
-                      control={
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            color="primary"
-                            value={
-                              formData.data[field.name]
-                                ? dayjs(formData.data[field.name]).isValid()
-                                  ? dayjs(formData.data[field.name])
-                                  : null
-                                : null
-                            }
-                            onChange={(e) => {
-                              handleDateChange(field.name, e, field.type);
-                            }}
-                            InputLabelProps={{
-                              style: {
-                                color: focusedField === field.name ? '#000' : '#000'
-                              }
-                            }}
-                            InputProps={{
-                              style: {
-                                color: '#000',
-                                borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                              }
-                            }}
-                            onFocus={() => handleFieldFocus(field.name)}
-                            onBlur={() => setFocusedField(null)}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                  borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                                },
-                                '&:hover fieldset': {
-                                  borderColor: '#1890ff'
-                                },
-                                '&.Mui-focused fieldset': {
-                                  borderColor: '#1890ff'
-                                }
-                              },
-                              '& .MuiOutlinedInput-input': {
-                                color: '#1890ff' // Change the text color
-                              }
-                            }}
-                          />
-                        </LocalizationProvider>
-                      }
-                    />
-                  </div>
-                  {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
-                </FormControl>
-              )}
-              {field.type === 'time' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <InputLabel style={{ color: focusedField === field.name ? '#000' : '#000' }}>{field.label}</InputLabel>
-                  <div style={{ marginTop: '50px', padding: '0px 20px 20px 20px' }}>
-                    <FormControlLabel
-                      control={
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <TimePicker
-                            color="primary"
-                            value={formData.data[field.name] ? formData.data[field.name] : null}
-                            onChange={(e) => {
-                              handleDateChange(field.name, e, field.type);
-                            }}
-                            InputLabelProps={{
-                              style: {
-                                color: focusedField === field.name ? '#000' : '#000'
-                              }
-                            }}
-                            InputProps={{
-                              style: {
-                                color: '#000',
-                                borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                              }
-                            }}
-                            onFocus={() => handleFieldFocus(field.name)}
-                            onBlur={() => setFocusedField(null)}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                  borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                                },
-                                '&:hover fieldset': {
-                                  borderColor: '#1890ff'
-                                },
-                                '&.Mui-focused fieldset': {
-                                  borderColor: '#1890ff'
-                                }
-                              },
-                              '& .MuiOutlinedInput-input': {
-                                color: '#1890ff' // Change the text color
-                              }
-                            }}
-                          />
-                        </LocalizationProvider>
-                      }
-                    />
-                  </div>
-                  {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
-                </FormControl>
-              )}
-              {field.type === 'search' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <Autocomplete
-                    options={field.options || []} // Ensure that options is defined or provide a default value
-                    getOptionLabel={(option) => option.label}
-                    value={formData.data[field.name]}
-                    onChange={(e) => {
-                      if (field.action) {
-                        field.action(e);
-                      }
-                      handleChange(e); // Make sure to call handleChange if needed
-                    }}
-                    disableClearable
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={field.label}
-                        InputLabelProps={{
-                          style: {
-                            color: focusedField === field.name ? '#000' : '#000'
-                          }
-                        }}
-                        InputProps={{
-                          ...params.InputProps,
-                          style: {
-                            color: '#000',
-                            borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                          }
-                        }}
-                        onFocus={() => handleFieldFocus(field.name)}
-                        onBlur={() => setFocusedField(null)}
-                      />
-                    )}
-                  />
-                </FormControl>
-              )}
-
-              {field.type === 'datetime' && (
-                <FormControl style={{ width: '100%', marginBottom: '15px' }}>
-                  <InputLabel style={{ color: focusedField === field.name ? '#000' : '#000' }}>{field.label}</InputLabel>
-                  <div style={{ marginTop: '50px', padding: '0px 20px 20px 20px' }}>
-                    <FormControlLabel
-                      control={
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DateTimePicker
-                            color="primary"
-                            value={formData.data[field.name] ? formData.data[field.name] : null}
-                            onChange={(e) => {
-                              handleDateChange(field.name, e, field.type);
-                            }}
-                            InputLabelProps={{
-                              style: {
-                                color: focusedField === field.name ? '#000' : '#000'
-                              }
-                            }}
-                            InputProps={{
-                              style: {
-                                color: '#000',
-                                borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                              }
-                            }}
-                            onFocus={() => handleFieldFocus(field.name)}
-                            onBlur={() => setFocusedField(null)}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                  borderColor: focusedField === field.name ? '#1890ff' : '#000'
-                                },
-                                '&:hover fieldset': {
-                                  borderColor: '#1890ff'
-                                },
-                                '&.Mui-focused fieldset': {
-                                  borderColor: '#1890ff'
-                                }
-                              },
-                              '& .MuiOutlinedInput-input': {
-                                color: '#1890ff' // Change the text color
-                              }
-                            }}
-                          />
-                        </LocalizationProvider>
-                      }
-                    />
-                  </div>
-                  {formData.errors[field.name] && <FormHelperText>{formData.errors[field.name]}</FormHelperText>}
-                </FormControl>
-              )}
+            <Grid item xs={field.xs} key={field.name}>
+              {field.type === 'file' && renderFileField(field)}
+              {field.type === 'select' && renderSelectField(field)}
+              {field.type === 'search' && renderSearch(field)}
+              {field.type === 'checkgroup' && renderCheckGroup(field)}
+              {(field.type === 'textlist' || field.type === 'numberlist') && renderListInputs(field)}
+              {field.type === 'textarea' && renderTextareaField(field)}
+              {(field.type === 'date' || field.type === 'time' || field.type === 'datetime') && renderDate(field)}
+              {(field.type === 'text' || field.type === 'email' || field.type === 'number' || field.type === 'password') &&
+                renderTextField(field)}
             </Grid>
           ))}
         </Grid>
-        <Box sx={{ width: '100%', display: 'flex', padding: '20px', justifyContent: 'space-between' }}>
-          <Button disabled={props.count == 0} variant="contained" onClick={props.handlePrev}>
+        <Box sx={{ width: '100%', display: 'flex', gap: '30px', justifyContent: 'space-between' }}>
+          <Button
+            disabled={props.count == 0}
+            variant="contained"
+            style={{
+              width: '100%',
+              background: theme.palette.primary.main,
+              color: theme.palette.common.white,
+              height: '50px',
+              borderRadius: theme.shape.borderRadius,
+              marginBottom: theme.spacing(1)
+            }}
+            onClick={props.handlePrev}
+          >
             Previous
           </Button>
-          <Button type="submit" variant="contained">
+          <Button
+            type="submit"
+            variant="contained"
+            style={{
+              width: '100%',
+              background: theme.palette.primary.main,
+              color: theme.palette.common.white,
+              paddingLeft: '20px',
+              height: '50px',
+              borderRadius: theme.shape.borderRadius,
+              marginBottom: theme.spacing(1)
+            }}
+          >
             {columns[0].buttonText ? columns[0].buttonText : 'Next'}
           </Button>
         </Box>
