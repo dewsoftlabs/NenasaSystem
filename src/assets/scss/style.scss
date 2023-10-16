@@ -178,7 +178,37 @@ div.modal-container {
   }
 }
 
+.css-1bwloip-MuiPaper-root-MuiCard-root{
+  border: none;
+}
 
-.MuiCollapse-entered{
-  display: none;
+
+
+// UserSettingsMainPage.scss
+
+.skeleton-loading {
+  margin: 10px;
+
+  .skeleton-progress {
+    height: 10px;
+    width: 100%;
+    background-color: #eee; // Light gray background
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .skeleton-title {
+    height: 30px;
+    width: 80%;
+    background-color: #eee; // Light gray background
+    border-radius: 4px;
+  }
+}
+
+.text-link{
+  text-decoration: none;
+}
+
+.react-calendar__viewContainer {
+  color: #000; /* Set your desired text color */
 }

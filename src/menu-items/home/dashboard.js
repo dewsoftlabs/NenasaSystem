@@ -6,6 +6,7 @@ import { IconAdjustmentsAlt } from '@tabler/icons-react';
 import { IconUserDollar } from '@tabler/icons-react';
 import { IconFileTypePdf } from '@tabler/icons-react';
 import { IconBrandCashapp } from '@tabler/icons-react';
+import { IconCurrencyDollarSingapore } from '@tabler/icons-react';
 
 // constant
 const icons = {
@@ -15,15 +16,15 @@ const icons = {
   IconAdjustmentsAlt,
   IconUserDollar,
   IconFileTypePdf,
-  IconBrandCashapp
+  IconBrandCashapp,
+  IconCurrencyDollarSingapore
 };
-
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
 const dashboard = {
   id: 'dashboard',
-  title: 'Dashboard',
+  title: '',
   type: 'group',
   children: [
     {
@@ -31,7 +32,19 @@ const dashboard = {
       title: 'Dashboard',
       type: 'item',
       url: '/dashboard',
+      permissionCode: '',
       icon: icons.IconDashboard,
+      breadcrumbs: false
+    },
+    {
+      id: 'cashier',
+      title: 'Cashier',
+      type: 'item',
+      url: '/cashier',
+      external: true,
+      target: '_blank',
+      permissionCode: 'cashierpannel',
+      icon: icons.IconCurrencyDollarSingapore,
       breadcrumbs: false
     },
     {
@@ -39,6 +52,7 @@ const dashboard = {
       title: 'Customer',
       type: 'collapse',
       icon: icons.IconUserDollar,
+      permissionCode: 'customer',
 
       children: [
         {
@@ -46,6 +60,7 @@ const dashboard = {
           title: 'Customer List',
           type: 'item',
           url: '/customer-list',
+          permissionCode: 'customerlist',
           target: true
         },
         {
@@ -53,6 +68,7 @@ const dashboard = {
           title: 'Ariyas Customer List',
           type: 'item',
           url: '/ariyas-customer',
+          permissionCode: 'ariyascustomer',
           target: true
         },
         {
@@ -60,6 +76,7 @@ const dashboard = {
           title: 'Guarantees',
           type: 'item',
           url: '/guranteer',
+          permissionCode: 'guranter',
           target: true
         }
       ]
@@ -69,13 +86,23 @@ const dashboard = {
       title: 'Loan',
       type: 'collapse',
       icon: icons.IconClipboardText,
+      permissionCode: 'loan',
 
       children: [
+        {
+          id: 'loan-list',
+          title: 'Loan List',
+          type: 'item',
+          url: '/loan-list',
+          permissionCode: 'loanlist',
+          target: true
+        },
         {
           id: 'apply-loan',
           title: 'Apply Loan',
           type: 'item',
           url: '/apply-loan',
+          permissionCode: 'loanadd',
           target: true
         },
         {
@@ -83,6 +110,7 @@ const dashboard = {
           title: 'Cancel Loan',
           type: 'item',
           url: '/cancel-loan',
+          permissionCode: 'loancancel',
           target: true
         }
       ]
@@ -92,20 +120,22 @@ const dashboard = {
       title: 'Deposit',
       type: 'collapse',
       icon: icons.IconBrandCashapp,
-
+      permissionCode: 'deposit',
       children: [
         {
           id: 'create-deposit-account',
-          title: 'Apply Loan',
+          title: 'Create Deposit Account',
           type: 'item',
-          url: '/apply-loan',
+          url: '/create-deposit-account',
+          permissionCode: 'depositaccounts',
           target: true
         },
         {
-          id: 'register3',
-          title: 'Register',
+          id: 'deposit-accounts',
+          title: 'Deposit Accounts',
           type: 'item',
-          url: '/pages/register/register3',
+          url: '/deposit-accounts',
+          permissionCode: '',
           target: true
         }
       ]
@@ -115,6 +145,7 @@ const dashboard = {
       title: 'Reports',
       type: 'collapse',
       icon: icons.IconFileTypePdf,
+      permissionCode: 'reports',
 
       children: [
         {
@@ -122,6 +153,7 @@ const dashboard = {
           title: 'Login',
           type: 'item',
           url: '/pages/login/login3',
+          permissionCode: '',
           target: true
         },
         {
@@ -129,6 +161,7 @@ const dashboard = {
           title: 'Register',
           type: 'item',
           url: '/pages/register/register3',
+          permissionCode: '',
           target: true
         }
       ]
