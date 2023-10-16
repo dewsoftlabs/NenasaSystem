@@ -25,29 +25,6 @@ const filters = {
   type: 'group',
   children: [
     {
-      id: 'employee',
-      title: 'Employee',
-      type: 'collapse',
-      icon: icons.IconUsersGroup,
-
-      children: [
-        {
-          id: 'reister-employee',
-          title: 'Register Employee',
-          type: 'item',
-          url: '/reister-employee',
-          target: true
-        },
-        {
-          id: 'employee-salary',
-          title: 'Employee Salary',
-          type: 'item',
-          url: '/employee-salary',
-          target: true
-        }
-      ]
-    },
-    {
       id: 'category',
       title: 'Category',
       type: 'item',

@@ -9,6 +9,11 @@ import Loadable from 'ui-component/Loadable';
 const UserSettings = Loadable(lazy(() => import('views/settings/UserSettings')));
 const PermissionSettings = Loadable(lazy(() => import('views/settings/PermissionSettings')));
 const UserroleSettings = Loadable(lazy(() => import('views/settings/UserRoleSettings')));
+const BranchSettings = Loadable(lazy(() => import('views/settings/BranchSettings')));
+const CompanySettings = Loadable(lazy(() => import('views/settings/CompanySettings')));
+const Types = Loadable(lazy(() => import('views/settings/Types')));
+const Filters = Loadable(lazy(() => import('views/settings/Filters')));
+const UserProfileSettings = Loadable(lazy(() => import('views/settings/UserProfileSettings')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -27,6 +32,26 @@ const MainRoutes = {
     {
       path: '/permission-settings',
       element: <PermissionSettings />
+    },
+    {
+      path: '/account-settings',
+      element: <UserProfileSettings />
+    },
+    {
+      path: '/branch-settings',
+      element: <BranchSettings />
+    },
+    {
+      path: '/company-settings',
+      element: <CompanySettings />
+    },
+    {
+      path: '/types',
+      element: <Types />
+    },
+    {
+      path: '/filters',
+      element: <Filters />
     },
     {
       path: 'user-settings',

@@ -3,20 +3,30 @@
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Box, Button, MenuItem, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import { MaterialReactTable } from 'material-react-table';
 import { useEffect, useRef, useState } from 'react';
 import { ExportToCsv } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { toast } from 'react-toastify';
+import { hasPermission, getUserRoleID } from '../../session';
 import logosrc from '../../assets/images/logo.jpg';
 
 import { IconFileSpreadsheet, IconPlus, IconPdf, IconTrash } from '@tabler/icons-react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 
 function SimpleTable(props) {
   const tableInstanceRef = useRef(null);
   const { tableSettings } = props;
+  const theme = useTheme();
+  const history = useNavigate();
+
+
+  const shopName = useSelector((state) => state.shop.shopname);
+  const image = useSelector((state) => state.shop.logo);
 
   const handleExportData = () => {
     const headersList = props.columns.filter((column) => column.accessorKey && column.export).map((column) => column.accessorKey);
@@ -77,7 +87,7 @@ function SimpleTable(props) {
     }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     const headersList = props.columns.filter((column) => column.accessorKey && column.export).map((column) => column.accessorKey);
 
     const data = props.dataSet.map((item) => {
@@ -97,62 +107,69 @@ function SimpleTable(props) {
 
     const doc = new jsPDF();
 
+    console.log(image);
+
     const robotoFontUrl = 'https://fonts.googleapis.com/css2?family=Roboto&family=Varela+Round&display=swap';
-    const logo = new Image();
-    logo.src = logosrc; // Replace with your logo URL
-    const logoWidth = 20; // Adjust the logo width as needed
-    const logoHeight = 20;
+    try {
+      const logo = await loadImage(`${process.env.REACT_APP_API_ENDPOINT}/shop/getlogo/${image}`);
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const textWidth = doc.getStringUnitWidth(`Table - ${tableSettings.table}`);
-    const textX = (pageWidth - textWidth * doc.internal.getFontSize()) / 2;
+      const logoWidth = 20; // Adjust the logo width as needed
+      const logoHeight = 20;
 
-    // Draw a border around the entire page
-    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
-    doc.rect(5, 5, pageWidth - 10, 30);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const textWidth = doc.getStringUnitWidth(`Table - ${tableSettings.table}`);
+      const textX = (pageWidth - textWidth * doc.internal.getFontSize()) / 2;
 
-    // Generate a PDF with the formatted data
-    doc.addImage(logo, 'PNG', 10, 8, logoWidth, logoHeight);
-    doc.setFontSize(14);
-    doc.setFont('Roboto', 'normal');
-    doc.text('Nenasa Investment (Pvt) Ltd', 35, 22);
-    doc.text(`${tableSettings.table} Report`, 35, 28);
-    doc.setFont('Roboto', 'normal');
+      // Draw a border around the entire page
+      doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+      doc.rect(5, 5, pageWidth - 10, 30);
 
-    // Capitalize the first letter of each header
-    const capitalizedHeadersList = headersList.map((header) => header.charAt(0).toUpperCase() + header.slice(1));
+      // Generate a PDF with the formatted data
+      // Determine the image format based on the file extension
+      const imageFormat = image.endsWith('.jpg') || image.endsWith('.jpeg') ? 'JPEG' : 'PNG';
 
-    if (data.length > 0) {
-      const dataForPDF = data.map((item) => {
-        return headersList.map((header) => item[header]);
-      });
+      doc.addImage(logo, imageFormat, 10, 8, logoWidth, logoHeight);
+      doc.setFontSize(14);
+      doc.setFont('Roboto', 'normal');
+      doc.text(shopName, 35, 22);
+      doc.text(`${tableSettings.table} Report`, 35, 28);
+      doc.setFont('Roboto', 'normal');
 
-      doc.autoTable({
-        head: [capitalizedHeadersList], // Use the capitalized headers
-        body: dataForPDF,
-        startY: 50
-      });
+      // Capitalize the first letter of each header
+      const capitalizedHeadersList = headersList.map((header) => header.charAt(0).toUpperCase() + header.slice(1));
 
-      // Save the PDF
-      doc.save(`${tableSettings.table}.pdf`);
-    } else {
-      // Handle the case where there is no data to export
-      showToast('No data to export to PDF.', 'warn');
+      if (data.length > 0) {
+        const dataForPDF = data.map((item) => {
+          return headersList.map((header) => item[header]);
+        });
+
+        doc.autoTable({
+          head: [capitalizedHeadersList], // Use the capitalized headers
+          body: dataForPDF,
+          startY: 50
+        });
+
+        // Save the PDF
+        doc.save(`${tableSettings.table}.pdf`);
+      } else {
+        // Handle the case where there is no data to export
+        showToast('No data to export to PDF.', 'warn');
+      }
+    } catch (error) {
+      console.error('Error loading image:', error);
+      showToast('Error loading image.', 'error');
     }
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: 'light',
-      primary: {
-        main: '#000'
-      },
-      background: {
-        default: '#fff'
-      }
-    }
-  });
+  const loadImage = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.src = imageUrl;
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+    });
+  };
 
   const showToast = (message, type = 'success') => {
     toast[type](message, {
@@ -181,32 +198,32 @@ function SimpleTable(props) {
   }, [pagination.pageIndex, pagination.pageSize]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <MaterialReactTable
-        columns={props.columns}
-        data={props.dataSet}
-        enableGrouping={tableSettings.group.enableGroup}
-        enableStickyHeader
-        enableStickyFooter
-        initialState={{
-          density: 'compact',
-          expanded: tableSettings.group.expanded, //expand all groups by default
-          grouping: tableSettings.group.groupColumn
-        }}
-        getRowId={(row) => row[tableSettings.idName]}
-        enableEditing={tableSettings.editing.enableEditing}
-        editingMode={tableSettings.editing.editionMode}
-        enablePagination={tableSettings.pagination.enablePagination}
-        positionPagination={tableSettings.pagination.positionPagination}
-        enableRowSelection={tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix' ? true : false}
-        state={{
-          isLoading: props.isLoading,
-          pagination
-        }}
-        onPaginationChange={setPagination}
-        renderTopToolbarCustomActions={({ table }) => (
-          <Box sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}>
-            {tableSettings.add.enableAddButton == true && (
+    <MaterialReactTable
+      columns={props.columns}
+      data={props.dataSet}
+      enableGrouping={tableSettings.group.enableGroup}
+      enableStickyHeader
+      enableStickyFooter
+      initialState={{
+        density: 'compact',
+        expanded: tableSettings.group.expanded, //expand all groups by default
+        grouping: tableSettings.group.groupColumn
+      }}
+      getRowId={(row) => row[tableSettings.idName]}
+      enableEditing={tableSettings.editing.enableEditing}
+      editingMode={tableSettings.editing.editionMode}
+      enablePagination={tableSettings.pagination.enablePagination}
+      positionPagination={tableSettings.pagination.positionPagination}
+      enableRowSelection={tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix' ? true : false}
+      state={{
+        isLoading: props.isLoading,
+        pagination
+      }}
+      onPaginationChange={setPagination}
+      renderTopToolbarCustomActions={({ table }) => (
+        <Box sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}>
+          {(hasPermission(tableSettings.add.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+            tableSettings.add.enableAddButton == true && (
               <div>
                 <Button
                   style={{ color: '#000', backgroundColor: '#ffffff' }}
@@ -220,92 +237,124 @@ function SimpleTable(props) {
                 </Button>
               </div>
             )}
-            {tableSettings.delete.deleteType === 'multiple' ||
-              (tableSettings.delete.deleteApi !== '' && tableSettings.delete.deleteType === 'mix' && (
-                <div>
-                  <Button
-                    style={{ color: '#000', backgroundColor: '#fff' }}
-                    onClick={() => {
-                      props.deleteOpen(tableInstanceRef.current?.getSelectedRowModel().rows);
-                    }}
-                    startIcon={<DeleteOutlineOutlinedIcon />}
-                    variant="contained"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              ))}
-            {tableSettings.enableCSVExport && (
+          {(hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+            (tableSettings.delete.deleteType == 'multiple' || tableSettings.delete.deleteType === 'mix') && (
               <div>
                 <Button
                   style={{ color: '#000', backgroundColor: '#fff' }}
-                  onClick={handleExportData}
-                  startIcon={<IconFileSpreadsheet />}
+                  onClick={() => {
+                    props.deleteOpen(tableInstanceRef.current?.getSelectedRowModel().rows);
+                  }}
+                  startIcon={<DeleteOutlineOutlinedIcon />}
                   variant="contained"
                 >
-                  CSV / Excel
+                  Delete
                 </Button>
               </div>
             )}
-            {tableSettings.enablepdf && (
-              <div>
-                <Button
-                  style={{ color: '#000', backgroundColor: '#fff' }}
-                  onClick={handleExportPDF}
-                  startIcon={<IconPdf />}
-                  variant="contained"
-                >
-                  PDF
-                </Button>
-              </div>
-            )}
-          </Box>
-        )}
-        onEditingRowSave={handleSaveRow}
-        renderRowActionMenuItems={
-          tableSettings.editing.actionMenu.enableActionMenu ||
-          tableSettings.delete.deleteType === 'single' ||
-          tableSettings.delete.deleteType === 'mix'
-            ? ({ row, closeMenu }) => {
-                const deleteMenuItem =
-                  (tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix') &&
-                  tableSettings.delete.singleDeleteApi !== '' ? (
-                    <MenuItem
-                      key={1}
-                      onClick={() => {
-                        props.deleteOpen(row.id);
-                        closeMenu();
-                      }}
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                    >
-                      <IconTrash /> {tableSettings.delete.deleteText ? tableSettings.delete.deleteText : 'Delete'}
-                    </MenuItem>
-                  ) : null;
-
-                const actionMenuItems = tableSettings.editing.actionMenu.actionMenudata.map((menuItem, index) => (
+          {tableSettings.enableCSVExport && (
+            <div>
+              <Button
+                style={{ color: '#000', backgroundColor: '#fff' }}
+                onClick={handleExportData}
+                startIcon={<IconFileSpreadsheet />}
+                variant="contained"
+              >
+                CSV / Excel
+              </Button>
+            </div>
+          )}
+          {tableSettings.enablepdf && (
+            <div>
+              <Button
+                style={{ color: '#000', backgroundColor: '#fff' }}
+                onClick={handleExportPDF}
+                startIcon={<IconPdf />}
+                variant="contained"
+              >
+                PDF
+              </Button>
+            </div>
+          )}
+        </Box>
+      )}
+      muiTableBodyRowProps={
+        tableSettings.row.rowSelect &&
+        (({ row }) => ({
+          onClick: () => {
+            history(tableSettings.row.rowRedirect + row.id);
+          },
+          sx: {
+            cursor: tableSettings.row.rowSelect ? 'pointer' : 'default'
+          }
+        }))
+      }
+      onEditingRowSave={handleSaveRow}
+      muiToolbarAlertBannerChipProps={{
+        sx: (theme) => ({
+          backgroundColor: theme.palette.background['paper']
+        })
+      }}
+      muiTopToolbarProps={{
+        sx: (theme) => ({
+          '& button': {
+            color: theme.palette.text.primary
+          }
+        })
+      }}
+      muiTableProps={{
+        sx: (theme) => ({
+          '& button': {
+            color: theme.palette.text.primary
+          },
+          '& svg': {
+            color: theme.palette.text.primary
+          }
+        })
+      }}
+      renderRowActionMenuItems={
+        tableSettings.editing.actionMenu.enableActionMenu ||
+        tableSettings.delete.deleteType === 'single' ||
+        tableSettings.delete.deleteType === 'mix'
+          ? ({ row, closeMenu }) => {
+              const deleteMenuItem =
+                (hasPermission(tableSettings.delete.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) &&
+                (tableSettings.delete.deleteType === 'single' || tableSettings.delete.deleteType === 'mix') ? (
                   <MenuItem
-                    key={index + 2} // Start the key from 2 to avoid conflicts with the deleteMenuItem key
+                    key={1}
                     onClick={() => {
-                      menuItem.action(row);
+                      props.deleteOpen(row.id);
                       closeMenu();
                     }}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                   >
-                    {menuItem.icon} {menuItem.menuName}
+                    <IconTrash /> {tableSettings.delete.deleteText ? tableSettings.delete.deleteText : 'Delete'}
                   </MenuItem>
-                ));
+                ) : null;
 
-                return [...actionMenuItems, deleteMenuItem];
-              }
-            : null // If action menu is not enabled, set to null
-        }
-        positionActionsColumn={tableSettings.editing.actionMenu.positionActionsColumn}
-        enableClickToCopy={tableSettings.enableCopy}
-        enableRowNumbers={tableSettings.enableRowNumbers}
-        tableInstanceRef={tableInstanceRef}
-        enableRowActions={tableSettings.rowAction}
-      />
-    </ThemeProvider>
+              const actionMenuItems = tableSettings.editing.actionMenu.actionMenudata.map((menuItem, index) => (
+                <MenuItem
+                  key={index + 2} // Start the key from 2 to avoid conflicts with the deleteMenuItem key
+                  onClick={() => {
+                    menuItem.action(row);
+                    closeMenu();
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  {menuItem.icon} {menuItem.menuName}
+                </MenuItem>
+              ));
+
+              return [...actionMenuItems, deleteMenuItem];
+            }
+          : null // If action menu is not enabled, set to null
+      }
+      positionActionsColumn={tableSettings.editing.actionMenu.positionActionsColumn}
+      enableClickToCopy={tableSettings.enableCopy}
+      enableRowNumbers={tableSettings.enableRowNumbers}
+      tableInstanceRef={tableInstanceRef}
+      enableRowActions={tableSettings.rowAction}
+    />
   );
 }
 

@@ -9,6 +9,7 @@ export const initialState = {
   defaultId: '/',
   fontFamily: config.fontFamily,
   borderRadius: config.borderRadius,
+  darkMode: config.darkMode, // Initially set based on the configuration
   opened: true
 };
 
@@ -37,6 +38,11 @@ const customizationReducer = (state = initialState, action) => {
       return {
         ...state,
         borderRadius: action.borderRadius
+      };
+    case actionTypes.TOGGLE_DARK_MODE:
+      return {
+        ...state,
+        darkMode: !state.darkMode // Toggle dark mode
       };
     default:
       return state;

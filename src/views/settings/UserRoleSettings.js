@@ -3,19 +3,167 @@
 import { Grid } from '@mui/material';
 import Axios from 'axios'; // Make sure to import Axios
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+import DialogBox from '../../components/Alert/Confirm';
+import { ToastContainer, toast } from 'react-toastify';
 import MainCard from 'ui-component/cards/MainCard';
 import Table from '../../components/table/Table'; // Update this with the actual path to your SimpleTable component
 import { getToken, logout } from '../../session'; // Import these functions if needed
 import { IconUserCircle } from '@tabler/icons';
 import { IconLock } from '@tabler/icons-react';
 import { IconTrashOff } from '@tabler/icons-react';
+import AddFormModal from 'components/modal/AddFormModal';
 
 const UserRoleSettingsMainPage = () => {
   const [userList, setUserList] = useState([]);
-  const [isLoading, setisLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [userRole, setUserRole] = useState([]);
   const [permission, setPermission] = useState([]);
+  const [formConfig, setFormConfig] = useState([]);
+
+  const [formData, setFormData] = useState({
+    data: {},
+    errors: {}
+  });
+
+  const [isOpenAddPermission, setIsOpenAddPermission] = useState(false);
+  const [id, setId] = useState(0);
+
+  const handleConfirmClose = () => {
+    setIsOpenAddPermission(false);
+    setIsOpenDelete(false);
+    setId(0);
+  };
+
+  const handleDeleteRole = async () => {
+    console.log('here');
+    try {
+      setIsLoading(true);
+
+      const response = await Axios.delete(`${process.env.REACT_APP_API_ENDPOINT}/userrole/delete/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': getToken()
+        }
+      });
+
+      if (response.status === 200) {
+        showToast('Delete Success');
+        fetchData();
+        handleConfirmClose();
+      } else if (response.status === 401) {
+        // logout();
+      } else {
+        showToast('Delete error', 'warn');
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // logout();
+      } else {
+        showToast('An error occurred', 'warn');
+      }
+    } finally {
+      setIsLoading(false);
+      handleConfirmClose();
+    }
+  };
+
+  const handleOpenDeleteRole = (id) => {
+    setIsOpenDelete(true);
+    setId(id);
+  };
+
+  const handleOpenAddPermission = (id) => {
+    setIsOpenAddPermission(true);
+    setId(id);
+
+    const filteredEditSelectOption = permission
+      .filter((option) => {
+        // Check if there is a matching userRole with userroleid and permission_code
+        return userRole.find((role) => role.userroleid === id && role.permission_code === option.permission_code) === undefined;
+      })
+      .map((option) => ({
+        value: option.permission_code,
+        text: option.permission_code,
+        other: option.permission_code
+      }));
+
+    // Create a form configuration object
+    const formConfigs = [
+      {
+        formName: 'userroleadd',
+        formHeading: 'User Role and Permission',
+        formType: 'simple', // dynamic | simple
+        headingVariant: 'h3',
+        fields: [
+          {
+            accessorKey: 'permisssionslist',
+            header: 'Pending Permissions List',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'checkgroup', // select | TextField | file | email | number | textarea | password | textlist | checkgroup
+              xs: 12,
+              isRequired: true,
+              validationType: 'default'
+            },
+            editSelectOptions: filteredEditSelectOption // Pass the filtered options here
+          }
+        ]
+      }
+    ];
+
+    setFormConfig(formConfigs);
+
+    console.log(formConfig);
+  };
+
+  const formSubmit = async (event) => {
+    console.log(event.data);
+    try {
+      setIsLoading(true);
+
+      const response = await Axios.put(`${process.env.REACT_APP_API_ENDPOINT}/userrole/addpermissions/${id}`, event.data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': getToken()
+        }
+      });
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        fetchData();
+        showToast(response.data.message);
+        handleConfirmClose();
+      } else if (response.status === 401) {
+        logout();
+      } else {
+        fetchData();
+        handleConfirmClose();
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.status === 401) {
+        window.location.reload();
+        logout();
+      } else {
+        showToast(error.response?.data.error || 'An error occurred', 'warn');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const showToast = (message, type = 'success') => {
+    toast[type](message, {
+      position: toast.POSITION.BOTTOM_RIGHT,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined
+    });
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -34,7 +182,7 @@ const UserRoleSettingsMainPage = () => {
     } catch (error) {
       handleErrorResponse(error);
     } finally {
-      setisLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -99,6 +247,9 @@ const UserRoleSettingsMainPage = () => {
         formHeading: 'User Role and Permission',
         formType: 'simple', // dynamic | simple
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'role',
@@ -136,6 +287,42 @@ const UserRoleSettingsMainPage = () => {
     [permission]
   );
 
+  const addPermission = useMemo(
+    () => [
+      {
+        formName: 'userroleadd',
+        formHeading: 'User Role and Permission',
+        formType: 'simple', // dynamic | simple
+        headingVariant: 'h3',
+        fields: [
+          {
+            accessorKey: 'permisssionslist',
+            header: 'Permissions List',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'checkgroup', // select | TextField | file | email | number | textarea | password | textlist | checkgroup
+              xs: 12,
+              isRequired: true,
+              validationType: 'default'
+            },
+            editSelectOptions: permission
+              .filter((option) => {
+                // Check if there is a matching userRole with userroleid and permission_code
+                return userRole.find((role) => role.userroleid === id && role.permission_code === option.permission_code) === undefined;
+              })
+              .map((option) => ({
+                value: option.permission_code,
+                text: option.permission_code,
+                other: option.permission_code
+              }))
+          }
+        ]
+      }
+    ],
+    [permission]
+  );
+
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 5 * 60 * 1000);
@@ -144,7 +331,7 @@ const UserRoleSettingsMainPage = () => {
 
   const table = {
     table: 'userrole',
-    tableType: 'advance',
+    tableType: 'advance', //simple | advance
     heading: 'User Role and Permission Table',
     enableHeading: false,
     enableCopy: false,
@@ -153,10 +340,14 @@ const UserRoleSettingsMainPage = () => {
     idName: 'assignpermissionid',
     enableCSVExport: true,
     enablepdf: true,
+    row: {
+      rowSelect: true,
+      rowRedirect: '/loan/loan-detail/'
+    },
     group: {
       enableGroup: true,
       groupColumn: ['role'], //eg ['role', 'status']
-      expanded: true
+      expanded: false
     },
     editing: {
       enableEditing: true,
@@ -168,15 +359,15 @@ const UserRoleSettingsMainPage = () => {
           {
             key: 2,
             action: (row) => {
-              console.info('Change Image', row);
+              handleOpenAddPermission(row.original.userroleid);
             },
             icon: <IconLock />,
             menuName: 'Add New Permission'
           },
           {
-            key: 2,
+            key: 3,
             action: (row) => {
-              console.info('Change Image', row);
+              handleOpenDeleteRole(row.original.userroleid);
             },
             icon: <IconTrashOff />,
             menuName: 'Delete Use Role'
@@ -188,9 +379,10 @@ const UserRoleSettingsMainPage = () => {
     },
 
     delete: {
+      permissionCode: '',
       deleteType: 'mix', //single | multiple | mix
       deleteApi: '', //multiple delete
-      deleteText: 'Deleten Permission', //use default keep empty
+      deleteText: 'Delete Permission', //use default keep empty
       singleDeleteApi: '/permission_group/delete/'
     },
     pagination: {
@@ -198,6 +390,7 @@ const UserRoleSettingsMainPage = () => {
       positionPagination: 'bottom'
     },
     add: {
+      permissionCode: '',
       enableAddButton: true,
       addButtonText: 'Add User Role', //use default keep empty
       addApi: '/userrole/create'
@@ -223,18 +416,28 @@ const UserRoleSettingsMainPage = () => {
 
   return (
     <MainCard>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={1500}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        style={{ zIndex: 9999 }} // Add a higher z-index value to ensure it appears on top
-      />
       <Grid item xs={12}>
+        {isOpenAddPermission && (
+          <AddFormModal
+            enableAddButton={true}
+            columns={formConfig}
+            formData={formData}
+            isOpen={isOpenAddPermission}
+            setFormData={setFormData}
+            formSubmit={formSubmit}
+            handleClose={handleConfirmClose}
+          />
+        )}
+        {isOpenDelete && (
+          <DialogBox
+            open={isOpenDelete}
+            desc={`Are you sure you want to delete this Role?`}
+            title="Confirm Delete"
+            buttonText="Delete"
+            handleClose={handleConfirmClose}
+            handleDelete={handleDeleteRole}
+          />
+        )}
         <Table
           createForm={createForm}
           fetchData={fetchData}
