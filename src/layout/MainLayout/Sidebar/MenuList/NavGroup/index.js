@@ -7,25 +7,26 @@ import { Divider, List, Typography } from '@mui/material';
 // project imports
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
-
+import { hasPermission, getUserRoleID } from '../../../../../session';
 // ==============================|| SIDEBAR MENU LIST GROUP ||============================== //
 
 const NavGroup = ({ item }) => {
   const theme = useTheme();
-
   // menu list collapse & items
   const items = item.children?.map((menu) => {
-    switch (menu.type) {
-      case 'collapse':
-        return <NavCollapse key={menu.id} menu={menu} level={1} />;
-      case 'item':
-        return <NavItem key={menu.id} item={menu} level={1} />;
-      default:
-        return (
-          <Typography key={menu.id} variant="h6" color="error" align="center">
-            Menu Items Error
-          </Typography>
-        );
+    if (menu.permissionCode == '' || hasPermission(menu.permissionCode) || getUserRoleID() == 1 || getUserRoleID() == 2) {
+      switch (menu.type) {
+        case 'collapse':
+          return <NavCollapse key={menu.id} menu={menu} level={1} />;
+        case 'item':
+          return <NavItem key={menu.id} item={menu} level={1} />;
+        default:
+          return (
+            <Typography key={menu.id} variant="h6" color="error" align="center">
+              Menu Items Error
+            </Typography>
+          );
+      }
     }
   });
 

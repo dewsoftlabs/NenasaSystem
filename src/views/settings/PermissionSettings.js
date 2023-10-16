@@ -69,6 +69,9 @@ const UserPermissionSettingsMainPage = () => {
         formName: 'permissopmadd',
         formHeading: 'Permission Create Form',
         headingVariant: 'h3',
+        buttonConfig: {
+          styles: {},
+        },
         fields: [
           {
             accessorKey: 'permission_code',
@@ -118,6 +121,10 @@ const UserPermissionSettingsMainPage = () => {
     idName: 'permissionid',
     enableCSVExport: false,
     enablepdf: false,
+    row: {
+      rowSelect: false,
+      rowRedirect: ''
+    },
     editing: {
       enableEditing: true,
       editionMode: 'row',

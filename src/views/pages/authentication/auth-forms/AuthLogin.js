@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
-
-// material-ui
 import { useTheme } from '@mui/material/styles';
+// material-ui
 import {
   Box,
   Button,
@@ -124,6 +123,31 @@ const Login = ({ ...others }) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 label="Username"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: theme.palette.background['paper'],
+                    borderColor: `${theme.palette.text.primary} !important`,
+
+                    '& fieldset': {
+                      borderColor: `${theme.palette.text.primary} !important`
+                    },
+
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.primary.main
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.primary.main
+                    }
+                  },
+                  '& fieldset': {
+                    borderColor: `${theme.palette.text.primary} !important`
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    color: theme.palette.text['primary'],
+                    backgroundColor: theme.palette.background['paper'],
+                    borderColor: `${theme.palette.text.primary} !important`
+                  }
+                }}
                 inputProps={{}}
               />
               {touched.username && errors.username && (
@@ -142,6 +166,31 @@ const Login = ({ ...others }) => {
                 name="password"
                 onBlur={handleBlur}
                 onChange={handleChange}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: theme.palette.background['paper'],
+                    borderColor: `${theme.palette.text.primary} !important`,
+
+                    '& fieldset': {
+                      borderColor: `${theme.palette.text.primary} !important`
+                    },
+
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.primary.main
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.primary.main
+                    }
+                  },
+                  '& fieldset': {
+                    borderColor: `${theme.palette.text.primary} !important`
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    color: theme.palette.text['primary'],
+                    backgroundColor: theme.palette.background['paper'],
+                    borderColor: `${theme.palette.text.primary} !important`
+                  }
+                }}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
@@ -177,7 +226,7 @@ const Login = ({ ...others }) => {
 
             <Box sx={{ mt: 2 }}>
               <AnimateButton>
-                <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="secondary">
+                <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
                   Sign in
                 </Button>
               </AnimateButton>
