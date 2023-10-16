@@ -55,6 +55,10 @@ const App = () => {
           <Helmet>
             <title>{shopName}</title>
             <link rel="icon" type="image/png" href={`${process.env.REACT_APP_API_ENDPOINT}/shop/getlogo/${image}`} sizes="16x16" />
+            <meta name="title" content={shopName} />
+            <meta name="description" content={shopName} />
+            <meta name="keywords" content={shopName} />
+            <meta name="author" content={shopName} />
             {/* Add more meta tags or links as needed */}
           </Helmet>
         </NavigationScroll>

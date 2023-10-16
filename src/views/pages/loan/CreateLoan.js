@@ -28,10 +28,12 @@ import StepForm from '../../../components/form/LoanCreateForm';
 import MarkedDatesCalendar from 'components/Calander/MarkDates';
 import MarkMonths from 'components/Calander/MarkMonths';
 import MarkWeek from 'components/Calander/MarkWeek';
+import { useTheme } from '@mui/material/styles';
 
 const steps = ['Personal Information', 'Loan Information', 'Guranter Information', 'Collection Information', 'Finish Loan Application'];
 
 const CreateLoan = () => {
+  const theme = useTheme();
   const [route, setRoute] = useState([]);
   const [terms, setTerms] = useState([]);
   const [depositType, setDepositType] = useState([]);
@@ -45,7 +47,7 @@ const CreateLoan = () => {
 
   const [count, setCount] = useState(0);
   const [loanAmount, setLoanAmount] = useState(0);
-  const limit = 3;
+  const limit = 4;
   const [isLoading, setisLoading] = useState(true);
 
   const [personalData, setPersonalData] = useState({
@@ -353,6 +355,30 @@ const CreateLoan = () => {
         buttonText: 'Finish',
         fields: [
           {
+            accessorKey: 'hold_startDate',
+            header: 'Hold Start Date',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'date', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
+            accessorKey: 'hold_endDate',
+            header: 'Hold End Date',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled | default
+              type: 'date', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
             accessorKey: 'depositType_id',
             header: 'Deposit type',
             formField: {
@@ -368,30 +394,6 @@ const CreateLoan = () => {
               value: depositType.depositType_id,
               text: depositType.depositType_name
             }))
-          },
-          {
-            accessorKey: 'hold_period',
-            header: 'Hold Period',
-            formField: {
-              isFormField: true,
-              disableOption: 'default', // readonly | disabled | default
-              type: 'number', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 6,
-              isRequired: true,
-              validationType: 'default' // default | custom
-            }
-          },
-          {
-            accessorKey: 'hold_startDate',
-            header: 'Hold Start Date',
-            formField: {
-              isFormField: true,
-              disableOption: 'default', // readonly | disabled | default
-              type: 'date', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 6,
-              isRequired: true,
-              validationType: 'default' // default | custom
-            }
           }
         ]
       }
@@ -542,6 +544,30 @@ const CreateLoan = () => {
             ]
           },
           {
+            accessorKey: 'startDate',
+            header: 'Start Date',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled
+              type: 'date', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
+            accessorKey: 'endDate',
+            header: 'End Date',
+            formField: {
+              isFormField: true,
+              disableOption: 'default', // readonly | disabled
+              type: 'date', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
+              xs: 6,
+              isRequired: true,
+              validationType: 'default' // default | custom
+            }
+          },
+          {
             accessorKey: 'document_charge',
             header: 'Document Charge',
             formField: {
@@ -620,7 +646,6 @@ const CreateLoan = () => {
   );
 
   const personalInformation_formSubmit = (event) => {
-    console.log(formData);
     handleNext();
   };
 
@@ -629,7 +654,6 @@ const CreateLoan = () => {
       ...prevState,
       loan: loanData.data
     }));
-    console.log(formData);
     handleNext();
   };
 
@@ -638,12 +662,26 @@ const CreateLoan = () => {
       ...prevState,
       guarantor: guaranterData.data
     }));
-    console.log(formData);
+    handleNext();
+  };
+
+  const handleCollectionSubmit = (event) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      collection: collection
+    }));
     handleNext();
   };
 
   const depositInformation_formSubmit = async (event) => {
     handleConfirm();
+    setFormData((prevState) => ({
+      ...prevState,
+      deposit: {
+        ...prevState.deposit,
+        deposithas: checked
+      }
+    }));
   };
 
   const handleSave = async () => {
@@ -657,7 +695,6 @@ const CreateLoan = () => {
 
     try {
       setisLoading(true);
-
       const response = await Axios.post(`${process.env.REACT_APP_API_ENDPOINT}/loan/create`, formData, {
         headers: {
           'Content-Type': 'application/json',
@@ -709,9 +746,6 @@ const CreateLoan = () => {
   const handleChange = (event) => {
     console.log(event);
   };
-  // Example of using showToast with a reload callback
-
-  console.log(loanData.data);
 
   return (
     <MainCard>
@@ -813,11 +847,37 @@ const CreateLoan = () => {
                   ) : (
                     <></>
                   )}
-                  <Box sx={{ width: '100%', display: 'flex', padding: '20px', justifyContent: 'space-between' }}>
-                    <Button disabled={count == 0} variant="contained" onClick={handlePrev}>
+                  <Box sx={{ width: '100%', display: 'flex', gap: '30px', justifyContent: 'space-between' }}>
+                    <Button
+                      disabled={count == 0}
+                      variant="contained"
+                      style={{
+                        width: '100%',
+                        background: theme.palette.primary.main,
+                        color: theme.palette.common.white,
+                        paddingLeft: '20px',
+                        height: '50px',
+                        borderRadius: theme.shape.borderRadius,
+                        marginBottom: theme.spacing(1)
+                      }}
+                      onClick={handlePrev}
+                    >
                       Previous
                     </Button>
-                    <Button type="button" variant="contained">
+                    <Button
+                      type="button"
+                      variant="contained"
+                      onClick={handleCollectionSubmit}
+                      style={{
+                        width: '100%',
+                        background: theme.palette.primary.main,
+                        color: theme.palette.common.white,
+                        paddingLeft: '20px',
+                        height: '50px',
+                        borderRadius: theme.shape.borderRadius,
+                        marginBottom: theme.spacing(1)
+                      }}
+                    >
                       Next
                     </Button>
                   </Box>
@@ -839,11 +899,38 @@ const CreateLoan = () => {
                     />
                   ) : (
                     <>
-                      <Box sx={{ width: '100%', display: 'flex', padding: '20px', justifyContent: 'space-between' }}>
-                        <Button disabled={count == 0} variant="contained" onClick={handlePrev}>
+                      <Box sx={{ width: '100%', display: 'flex', gap: '30px', justifyContent: 'space-between' }}>
+                        <Button
+                          disabled={count == 0}
+                          variant="contained"
+                          style={{
+                            width: '100%',
+                            background: theme.palette.primary.main,
+                            color: theme.palette.common.white,
+                            height: '50px',
+                            borderRadius: theme.shape.borderRadius,
+                            marginBottom: theme.spacing(1)
+                          }}
+                          onClick={handlePrev}
+                        >
                           Previous
                         </Button>
-                        <Button type="submit" variant="contained">
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          onClick={(e) => {
+                            depositInformation_formSubmit(e);
+                          }}
+                          style={{
+                            width: '100%',
+                            background: theme.palette.primary.main,
+                            color: theme.palette.common.white,
+                            paddingLeft: '20px',
+                            height: '50px',
+                            borderRadius: theme.shape.borderRadius,
+                            marginBottom: theme.spacing(1)
+                          }}
+                        >
                           Finish
                         </Button>
                       </Box>

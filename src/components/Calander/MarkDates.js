@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types'; // Import PropTypes
 import Calendar from 'react-calendar';
@@ -9,8 +10,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
 
 const MarkedDatesCalendar = (props) => {
+  const theme = useTheme();
   const { setData, data } = props;
   const [selectedDate, setSelectedDate] = useState();
 
@@ -31,17 +34,18 @@ const MarkedDatesCalendar = (props) => {
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} style={{ paddingBottom: '20px' }}>
       {/* Left side - Calendar */}
       <Grid item xs={12} md={6}>
         <Calendar
           onChange={setSelectedDate}
           value={selectedDate}
           onClickDay={handleDateClick}
-          tileClassName={({ date }) => (data.includes(date) ? 'marked' : null)}
+          tileClassName={({ date }) => (data.includes(date) ? '' : null)}
+          style={{ color: '#000' }}
         />
         <div style={{ paddingTop: '15px' }}>
-          <Button variant="contained" color="secondary" onClick={handleClearAll}>
+          <Button variant="contained" color="primary" onClick={handleClearAll}>
             Clear All
           </Button>
         </div>

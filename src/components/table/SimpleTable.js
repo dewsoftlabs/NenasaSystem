@@ -15,12 +15,16 @@ import logosrc from '../../assets/images/logo.jpg';
 import { IconFileSpreadsheet, IconPlus, IconPdf, IconTrash } from '@tabler/icons-react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 
 function SimpleTable(props) {
   const tableInstanceRef = useRef(null);
   const { tableSettings } = props;
 
   const history = useNavigate();
+
+  const shopName = useSelector((state) => state.shop.shopname);
+  const image = useSelector((state) => state.shop.logo);
 
   const handleExportData = () => {
     const headersList = props.columns.filter((column) => column.accessorKey && column.export).map((column) => column.accessorKey);
@@ -81,7 +85,7 @@ function SimpleTable(props) {
     }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     const headersList = props.columns.filter((column) => column.accessorKey && column.export).map((column) => column.accessorKey);
 
     const data = props.dataSet.map((item) => {
@@ -101,62 +105,69 @@ function SimpleTable(props) {
 
     const doc = new jsPDF();
 
+    console.log(image);
+
     const robotoFontUrl = 'https://fonts.googleapis.com/css2?family=Roboto&family=Varela+Round&display=swap';
-    const logo = new Image();
-    logo.src = logosrc; // Replace with your logo URL
-    const logoWidth = 20; // Adjust the logo width as needed
-    const logoHeight = 20;
+    try {
+      const logo = await loadImage(`${process.env.REACT_APP_API_ENDPOINT}/shop/getlogo/${image}`);
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const textWidth = doc.getStringUnitWidth(`Table - ${tableSettings.table}`);
-    const textX = (pageWidth - textWidth * doc.internal.getFontSize()) / 2;
+      const logoWidth = 20; // Adjust the logo width as needed
+      const logoHeight = 20;
 
-    // Draw a border around the entire page
-    doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
-    doc.rect(5, 5, pageWidth - 10, 30);
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const textWidth = doc.getStringUnitWidth(`Table - ${tableSettings.table}`);
+      const textX = (pageWidth - textWidth * doc.internal.getFontSize()) / 2;
 
-    // Generate a PDF with the formatted data
-    doc.addImage(logo, 'PNG', 10, 8, logoWidth, logoHeight);
-    doc.setFontSize(14);
-    doc.setFont('Roboto', 'normal');
-    doc.text('Nenasa Investment (Pvt) Ltd', 35, 22);
-    doc.text(`${tableSettings.table} Report`, 35, 28);
-    doc.setFont('Roboto', 'normal');
+      // Draw a border around the entire page
+      doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+      doc.rect(5, 5, pageWidth - 10, 30);
 
-    // Capitalize the first letter of each header
-    const capitalizedHeadersList = headersList.map((header) => header.charAt(0).toUpperCase() + header.slice(1));
+      // Generate a PDF with the formatted data
+      // Determine the image format based on the file extension
+      const imageFormat = image.endsWith('.jpg') || image.endsWith('.jpeg') ? 'JPEG' : 'PNG';
 
-    if (data.length > 0) {
-      const dataForPDF = data.map((item) => {
-        return headersList.map((header) => item[header]);
-      });
+      doc.addImage(logo, imageFormat, 10, 8, logoWidth, logoHeight);
+      doc.setFontSize(14);
+      doc.setFont('Roboto', 'normal');
+      doc.text(shopName, 35, 22);
+      doc.text(`${tableSettings.table} Report`, 35, 28);
+      doc.setFont('Roboto', 'normal');
 
-      doc.autoTable({
-        head: [capitalizedHeadersList], // Use the capitalized headers
-        body: dataForPDF,
-        startY: 50
-      });
+      // Capitalize the first letter of each header
+      const capitalizedHeadersList = headersList.map((header) => header.charAt(0).toUpperCase() + header.slice(1));
 
-      // Save the PDF
-      doc.save(`${tableSettings.table}.pdf`);
-    } else {
-      // Handle the case where there is no data to export
-      showToast('No data to export to PDF.', 'warn');
+      if (data.length > 0) {
+        const dataForPDF = data.map((item) => {
+          return headersList.map((header) => item[header]);
+        });
+
+        doc.autoTable({
+          head: [capitalizedHeadersList], // Use the capitalized headers
+          body: dataForPDF,
+          startY: 50
+        });
+
+        // Save the PDF
+        doc.save(`${tableSettings.table}.pdf`);
+      } else {
+        // Handle the case where there is no data to export
+        showToast('No data to export to PDF.', 'warn');
+      }
+    } catch (error) {
+      console.error('Error loading image:', error);
+      showToast('Error loading image.', 'error');
     }
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: 'dark',
-      primary: {
-        main: '#000'
-      },
-      background: {
-        default: '#fff'
-      }
-    }
-  });
+  const loadImage = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.src = imageUrl;
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+    });
+  };
 
   const showToast = (message, type = 'success') => {
     toast[type](message, {
@@ -199,17 +210,28 @@ function SimpleTable(props) {
         isLoading: props.isLoading,
         pagination
       }}
-      muiTableBodyRowProps={
-        tableSettings.row.rowSelect &&
-        (({ row }) => ({
-          onClick: () => {
-            history(tableSettings.row.rowRedirect + row.id);
-          },
-          sx: {
-            cursor: tableSettings.row.rowSelect ? 'pointer' : 'default'
+      muiToolbarAlertBannerChipProps={{
+        sx: (theme) => ({
+          backgroundColor: theme.palette.background['paper']
+        })
+      }}
+      muiTopToolbarProps={{
+        sx: (theme) => ({
+          '& button': {
+            color: theme.palette.text.primary
           }
-        }))
-      }
+        })
+      }}
+      muiTableProps={{
+        sx: (theme) => ({
+          '& button': {
+            color: theme.palette.text.primary
+          },
+          '& svg': {
+            color: theme.palette.text.primary
+          }
+        })
+      }}
       onPaginationChange={setPagination}
       renderTopToolbarCustomActions={({ table }) => (
         <Box sx={{ display: 'flex', gap: '1rem', p: '0.5rem', flexWrap: 'wrap' }}>
@@ -269,6 +291,17 @@ function SimpleTable(props) {
           )}
         </Box>
       )}
+      muiTableBodyRowProps={
+        tableSettings.row.rowSelect &&
+        (({ row }) => ({
+          onClick: () => {
+            history(tableSettings.row.rowRedirect + row.id);
+          },
+          sx: {
+            cursor: tableSettings.row.rowSelect ? 'pointer' : 'default'
+          }
+        }))
+      }
       onEditingRowSave={handleSaveRow}
       renderRowActionMenuItems={
         tableSettings.editing.actionMenu.enableActionMenu ||

@@ -265,19 +265,6 @@ const UserRoleSettingsMainPage = () => {
             }
           },
           {
-            accessorKey: 'role',
-            header: 'User Role',
-            formField: {
-              isFormField: true,
-              disableOption: 'default', // readonly | disabled | default
-              type: 'textlist', // select | TextField | file | email | phonenumber | number | hidden | textarea | password
-              xs: 12,
-              value: '',
-              isRequired: true,
-              validationType: 'default' // default | custom
-            }
-          },
-          {
             accessorKey: 'permisssionslist',
             header: 'Permissions List',
             formField: {

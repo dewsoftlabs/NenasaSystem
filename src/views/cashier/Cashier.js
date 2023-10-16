@@ -11,8 +11,10 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box } from '@mui/system';
 import CustomerDetails from './CustomerDetails';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useTheme } from '@mui/material/styles';
 
 const Cashier = () => {
+  const theme = useTheme();
   const [value, setValue] = useState('1');
   const [items, setItems] = useState([]);
   const [customerDetails, setCustomerDetails] = useState([]);
@@ -225,10 +227,37 @@ const Cashier = () => {
                     onChange={handleTextChange}
                     value={typedText}
                     inputRef={searchRef}
+                    style={{
+                      backgroundColor: theme.palette.background['paper']
+                    }}
                   />
                 )}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: theme.palette.background['paper'],
+                    borderColor: theme.palette.primary['main'],
+
+                    '& fieldset': {
+                      borderColor: theme.palette.primary.main
+                    },
+                    '&:hover fieldset': {
+                      borderColor: theme.palette.primary.main
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: theme.palette.primary.main
+                    }
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    color: theme.palette.text['primary'],
+                    backgroundColor: theme.palette.background['paper']
+                  }
+                }}
                 ref={autocompleteRef}
-                noOptionsText={<span style={{ color: '#000', background: '#fff' }}>{searching ? 'Searching..' : 'Not Found'}</span>}
+                noOptionsText={
+                  <span style={{ color: theme.palette.primary.main, background: theme.palette.background['paper'] }}>
+                    {searching ? 'Searching..' : 'Not Found'}
+                  </span>
+                }
               />
             </Grid>
           </Grid>

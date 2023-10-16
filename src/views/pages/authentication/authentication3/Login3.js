@@ -26,7 +26,13 @@ const Login = () => {
 
   return (
     <AuthWrapper1>
-      <Grid container direction="column" justifyContent="flex-end" sx={{ minHeight: '100vh' }}>
+      <Grid
+        style={{ backgroundColor: theme.palette.background.paper }}
+        container
+        direction="column"
+        justifyContent="flex-end"
+        sx={{ minHeight: '100vh' }}
+      >
         <Grid item xs={12}>
           <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: 'calc(100vh - 68px)' }}>
             <Grid item sx={{ m: { xs: 1, sm: 3 }, mb: 0 }}>
@@ -47,10 +53,10 @@ const Login = () => {
                     <Grid container direction={matchDownSM ? 'column-reverse' : 'row'} alignItems="center" justifyContent="center">
                       <Grid item>
                         <Stack alignItems="center" justifyContent="center" spacing={1}>
-                          <Typography color={theme.palette.secondary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
+                          <Typography color={theme.palette.text.primary} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
                             Hi, Welcome Back to
                           </Typography>
-                          <Typography color={theme.palette.secondary.main} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
+                          <Typography color={theme.palette.text.primary} gutterBottom variant={matchDownSM ? 'h3' : 'h2'}>
                             {shopName}
                           </Typography>
                         </Stack>

@@ -12,8 +12,10 @@ import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
 import { Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
+import { useTheme } from '@mui/material/styles';
 
 const MonthCalendar = (props) => {
+  const theme = useTheme();
   const { setData, data } = props;
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
@@ -62,7 +64,8 @@ const MonthCalendar = (props) => {
         endDate: new Date(monthEndDate) // Create a new Date object to avoid reference issues
       });
 
-      currentDate.setMonth(currentDate.getMonth() + 1, 1); // Move to the first day of the next month
+      // Move to the first day of the next month
+      currentDate.setMonth(currentDate.getMonth() + 1, 1);
       count++;
     }
 
@@ -115,7 +118,7 @@ const MonthCalendar = (props) => {
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} style={{ paddingBottom: '20px' }}>
       {/* Left side - Calendar */}
       <Grid item xs={12} md={6}>
         <Calendar
@@ -125,7 +128,7 @@ const MonthCalendar = (props) => {
         />
         <Grid container spacing={2} style={{ paddingTop: '30px' }}>
           <Grid item xs={12} md={4}>
-            <FormControlLabel control={<Checkbox checked={daterange} onChange={handleCheckboxChange} />} label="Date Range" />
+            <FormControlLabel control={<Checkbox checked={daterange} onChange={handleCheckboxChange} />} label="User Month Search" />
           </Grid>
           <Grid item xs={12} md={4}>
             <TextField
@@ -135,16 +138,44 @@ const MonthCalendar = (props) => {
               type="number"
               value={numberOfMonths}
               onChange={handleDropdownChange}
+              InputLabelProps={{
+                style: {
+                  color: theme.palette.text.primary
+                }
+              }}
+              InputProps={{
+                style: {
+                  color: theme.palette.text.primary,
+                  borderColor: theme.palette.text.primary
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: `${theme.palette.text.primary} !important`
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.primary.main
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.primary.main
+                  }
+                },
+                '& .MuiOutlinedInput-input': {
+                  color: theme.palette.text['primary'],
+                  backgroundColor: theme.palette.background['paper']
+                }
+              }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Button variant="contained" color="secondary" onClick={handleClick}>
+            <Button variant="contained" color="primary" onClick={handleClick}>
               Find Months
             </Button>
           </Grid>
         </Grid>
         <div style={{ paddingTop: '15px' }}>
-          <Button variant="contained" color="secondary" onClick={handleClearAll}>
+          <Button variant="contained" color="primary" onClick={handleClearAll}>
             Clear All
           </Button>
         </div>

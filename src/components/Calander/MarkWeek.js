@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { toast } from 'react-toastify';
+import { useTheme } from '@mui/material/styles';
 
 // Utility function to get the week number for a given date
 const getWeekNumber = (date) => {
@@ -22,6 +23,7 @@ const getWeekNumber = (date) => {
 };
 
 const WeekCalendar = ({ setData, data }) => {
+  const theme = useTheme();
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
   const [numberOfWeeks, setNumberOfWeeks] = useState(0);
@@ -41,13 +43,11 @@ const WeekCalendar = ({ setData, data }) => {
 
   const generateWeekData = (date) => {
     const weeks = [];
-    console.log(date);
     let currentDate = new Date(date[0]);
-    currentDate.setDate(currentDate.getDate() + 7 - currentDate.getDay() + 1); // Move to the next Monday
     let end = new Date(date[1]);
-    let count = 1;
+    let count = 0;
 
-    // Move to the next week to avoid including the start week
+    // Move to the next week from the selected date
     currentDate.setDate(currentDate.getDate() + 7);
 
     while (currentDate <= end) {
@@ -99,11 +99,29 @@ const WeekCalendar = ({ setData, data }) => {
 
   const handleClick = () => {
     if (selectedStartDate && numberOfWeeks > 0) {
-      const endDate = new Date(selectedStartDate);
-      endDate.setDate(endDate.getDate() + numberOfWeeks * 7);
+      const startWithOffset = new Date(selectedStartDate);
+      const startDate = new Date(selectedStartDate);
+      let weekCount = 0;
+
+      // Move to the next week from the selected start date
+      startWithOffset.setDate(startWithOffset.getDate() + 7);
+
+      // Increment the week count until it reaches the desired number of weeks
+      while (weekCount < numberOfWeeks - 1) {
+        // Move to the next week
+        startWithOffset.setDate(startWithOffset.getDate() + 7);
+
+        // Increment the week count
+        weekCount++;
+      }
+
+      // Calculate the end date
+      const endDate = new Date(startWithOffset);
+      endDate.setDate(endDate.getDate() + 6);
+
       setSelectedEndDate(endDate);
 
-      const getdate = [selectedStartDate, endDate];
+      const getdate = [startDate, endDate];
       handleDateClick(getdate);
     } else if (numberOfWeeks === 0) {
       toast.warn('Please enter the number of weeks ', {
@@ -127,11 +145,18 @@ const WeekCalendar = ({ setData, data }) => {
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} style={{ paddingBottom: '20px' }}>
       {/* Left side - Calendar */}
       <Grid item xs={12} md={6}>
         <Calendar
           onChange={handleDateClick}
+          style={{
+            // Your styles here
+            // For example:
+            borderRadius: '5px',
+            backgroundColor: '#ffcccb',
+            color: '#fff'
+          }}
           selectRange={daterange}
           value={selectedStartDate && selectedEndDate ? [selectedStartDate, selectedEndDate] : null}
         />
@@ -147,16 +172,44 @@ const WeekCalendar = ({ setData, data }) => {
               type="number"
               value={numberOfWeeks}
               onChange={handleDropdownChange}
+              InputLabelProps={{
+                style: {
+                  color: theme.palette.text.primary
+                }
+              }}
+              InputProps={{
+                style: {
+                  color: theme.palette.text.primary,
+                  borderColor: theme.palette.text.primary
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: `${theme.palette.text.primary} !important`
+                  },
+                  '&:hover fieldset': {
+                    borderColor: theme.palette.primary.main
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.primary.main
+                  }
+                },
+                '& .MuiOutlinedInput-input': {
+                  color: theme.palette.text['primary'],
+                  backgroundColor: theme.palette.background['paper']
+                }
+              }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Button variant="contained" color="secondary" onClick={handleClick}>
+            <Button variant="contained" color="primary" onClick={handleClick}>
               Find Weeks
             </Button>
           </Grid>
         </Grid>
         <div style={{ paddingTop: '15px' }}>
-          <Button variant="contained" color="secondary" onClick={handleClearAll}>
+          <Button variant="contained" color="primary" onClick={handleClearAll}>
             Clear All
           </Button>
         </div>
